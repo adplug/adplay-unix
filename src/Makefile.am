@@ -1,7 +1,7 @@
 bin_PROGRAMS = adplay
 
 adplay_SOURCES = adplay.cc getopt.c getopt1.c getopt.h output.cc output.h \
-	players.h
+	players.h defines.h
 
 EXTRA_adplay_SOURCES = oss.cc oss.h null.h disk.cc disk.h esound.cc esound.h \
 	qsa.cc qsa.h sdl.cc sdl.h
