@@ -245,11 +245,7 @@ int main(int argc, char **argv)
   }
   format = (bits == 16 ? AFMT_S16_LE : AFMT_S8);
   ioctl(audio_fd, SNDCTL_DSP_SETFMT, &format);
-  {
-    int stereo = channels - 1;
-    ioctl(audio_fd, SNDCTL_DSP_STEREO, &stereo);
-  }
-  ioctl(audio_fd, SNDCTL_DSP_CHANNELS, &channels);
+  ioctl(audio_fd, SOUND_PCM_WRITE_CHANNELS, &channels);
   ioctl(audio_fd, SNDCTL_DSP_SPEED, &freq);
 
   // main loop
