@@ -1,0 +1,21 @@
+AC_INIT(adplay,1.2)
+AC_CONFIG_SRCDIR(adplay.cc)
+AC_CONFIG_FILES(Makefile)
+AM_INIT_AUTOMAKE
+AM_PROG_LIBTOOL
+AC_LANG(C++)
+
+# Checks for programs.
+AC_PROG_INSTALL
+AC_PROG_CC
+AC_PROG_CXX
+
+# Checks for libraries.
+AC_CHECK_LIB(adplug,main,,[AC_MSG_ERROR([AdPlug not found!])])
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([fcntl.h sys/ioctl.h sys/soundcard.h],,
+[AC_MSG_ERROR([Sorry, no OSS sound support found.])])
+
+AC_OUTPUT
