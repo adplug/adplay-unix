@@ -1,0 +1,4 @@
+AdPlay/UNIX To Do List:
+-----------------------
+- Let configure determine the AdPlug library path and use
+  "adplay_LDADD = @PATH_TO_ADPLUG@" in Makefile.am.
