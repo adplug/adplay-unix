@@ -48,17 +48,14 @@ DiskWriter::DiskWriter(const char *filename, unsigned char nbits, unsigned char 
     exit(EXIT_FAILURE);
   }
 
-  // Determine machine byte ordering
-  if(f->getFlag(binio::BigEndian))
-    f->writeString("RIFX", 4);
-  else
-    f->writeString("RIFF", 4);
+  f->setFlag(binio::BigEndian, false);
 
   // Write Microsoft RIFF WAVE header
-  f->writeInt(36, 4); f->writeString("WAVEfmt ", 8); f->writeInt(16, 4);
-  f->writeInt(1, 2); f->writeInt(nchannels, 2); f->writeInt(nfreq, 4);
-  f->writeInt(nfreq * getsampsize(), 4); f->writeInt(getsampsize(), 2);
-  f->writeInt(nbits, 2); f->writeString("data", 4); f->writeInt(0, 4);
+  f->writeString("RIFF", 4); f->writeInt(36, 4); f->writeString("WAVEfmt ", 8);
+  f->writeInt(16, 4); f->writeInt(1, 2); f->writeInt(nchannels, 2);
+  f->writeInt(nfreq, 4); f->writeInt(nfreq * getsampsize(), 4);
+  f->writeInt(getsampsize(), 2); f->writeInt(nbits, 2);
+  f->writeString("data", 4); f->writeInt(0, 4);
 }
 
 DiskWriter::~DiskWriter()
