@@ -3,6 +3,7 @@ This is a brief overview of user-visible changes in adplay.
 Changes for version 1.2:
 	- Removed reference to adplug(3) from man page.
 	- More FreeBSD fixes.
+	- Some build fixes.
 
 Changes for version 1.1:
 	- Rewrote using GNU autotools.

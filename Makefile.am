@@ -1,12 +1,10 @@
 bin_PROGRAMS = adplay
 
-adplay_SOURCES = adplay.cc system.h aclocal.m4 getopt.c getopt1.c \
-		getopt.h
-adplay_LDFLAGS = -L$(libdir) -ladplug
+adplay_SOURCES = adplay.cc getopt.c getopt1.c getopt.h
+adplay_LDADD = @libdir@/libadplug.la
 
-INCLUDES = -I$(includedir)
-#CFLAGS = -Wall -g
-#CXXFLAGS = -Wall -g
+AM_CFLAGS = -Wall
+AM_CXXFLAGS = -Wall
 
 man_MANS = adplay.1
 

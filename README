@@ -1,24 +1,15 @@
-	adplay - OPL2 audio player
-
-  Copyright (C) 2001, 2002 Simon Peter
-
-  adplay is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+AdPlay/UNIX - UNIX console-based OPL2 audio player
+Copyright (C) 2001, 2002 Simon Peter <dn.tlp@gmx.net>
 
 Description
 -----------
-adplay is AdPlug's UNIX console-based frontend.
+AdPlay/UNIX is AdPlug's UNIX console-based frontend. AdPlug is a free,
+universal OPL2 audio playback library. AdPlay/UNIX supports the full range
+of AdPlug's file format playback features. Despite this, at the moment, only
+emulated OPL2 output is supported by AdPlay/UNIX.
+
+AdPlay/UNIX uses OSS-style /dev/dsp output, so you need a UNIX with OSS
+compatible sound support. Linux and BSD fall into this category...
 
 Prerequisites
 -------------
@@ -26,28 +17,45 @@ The following libraries are needed in order to compile this program:
 
 Library		Version
 -------		-------
-adplug		>= 1.1
+AdPlug		>= 1.1
 
 Installation
 ------------
-See file INSTALL for instructions.
+Please refer to the file INSTALL for installation instructions.
 
 CVS
 ---
 If you checked out from CVS, first run:
 
-./autogen.sh
+autoreconf --install
 
-to generate the build cruft and get the configure script.
+to generate the build cruft and get the configure script. You need recent
+versions of autoconf, automake and libtool to do this.
 
 Usage
 -----
-Start adplay with at least one file to be played as parameter. Additional
-commandline parameters are explained by typing:
+Start AdPlay/UNIX with at least one file to be played as parameter.
+Additional commandline parameters are explained by typing:
 
 adplay --help
 
-That's all for now. A more detailed doc will follow when i get the time to
-write one. Any help is greatly appreciated!
+Or by reading the man page. A more detailed doc will follow when i get the
+time to write one. Any help is greatly appreciated!
+
+Legal
+-----
+AdPlay/UNIX is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 	- Simon Peter <dn.tlp@gmx.net>
