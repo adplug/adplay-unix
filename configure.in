@@ -11,6 +11,8 @@ AC_LANG(C++)
 AC_PROG_INSTALL
 AC_PROG_CC
 AC_PROG_CXX
+AC_PROG_CPP
+AC_PROG_CXXCPP
 
 # Nothing works without these libraries...
 AC_CHECK_LIB(stdc++,main,,AC_MSG_ERROR([libstdc++ not installed]))
@@ -31,15 +33,19 @@ AC_ARG_ENABLE([output-sdl],AC_HELP_STRING([--disable-output-sdl],[Disable SDL ou
 # Check if we can compile the enabled drivers:
 # OSS driver
 if test ${enable_output_oss:=yes} = yes; then
-   AC_CHECKING([for OSS headers])
-   AC_TRY_CPP([[#include <fcntl.h>\
-			 #include <sys/ioctl.h>\
-			 #include <sys/soundcard.h>]],
-	AC_DEFINE(DRIVER_OSS,1,[Build OSS driver])
-	drivers=$drivers' oss.$(OBJEXT)'
-	AC_MSG_RESULT([found]),
-	enable_output_oss=no
-	AC_MSG_RESULT([not found -- OSS output disabled]))
+   AC_MSG_CHECKING([for OSS headers])
+   AC_TRY_CPP([
+                #include <fcntl.h>
+                #include <sys/ioctl.h>
+       		#include <sys/soundcard.h>
+              ],[
+               	AC_DEFINE(DRIVER_OSS,1,[Build OSS driver])
+               	drivers=$drivers' oss.$(OBJEXT)'
+               	AC_MSG_RESULT([found])
+              ],[
+               	enable_output_oss=no
+               	AC_MSG_RESULT([not found -- OSS output disabled])
+              ])
 fi
 
 # Null output
