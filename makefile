@@ -1,14 +1,16 @@
 # Makefile for AdPlay/Linux, (c) 2001 Simon Peter <dn.tlp@gmx.net>
 
-CXX		= c++
-CXXFLAGS	= -Wall
-CPPFLAGS	= 
-LDFLAGS		= -lpthread -ladplug
+CXX = c++
+INSTALL = install
 
-SRCS		= adplay.cpp makefile
-AUX		= README COPYING
+CXXFLAGS = -Wall
+LDFLAGS = -ladplug
 
-distname	= adplay-1.0
+SRCS = adplay.cpp makefile
+AUX = README COPYING
+
+distname = adplay-1.0
+bindir = /usr/local/bin
 
 all: adplay
 
@@ -17,11 +19,17 @@ clean:
 
 distclean: clean
 
+install: all
+	$(INSTALL) adplay $(bindir)
+
+uninstall:
+	rm $(bindir)/adplay
+
 dist:
 	-rm -rf $(distname)
 	mkdir $(distname)
 	cp $(SRCS) $(AUX) $(distname)
-	tar cfz $(distname).tar.gz $(distname)
+	tar cfj $(distname).tar.bz2 $(distname)
 	rm -rf $(distname)
 
 adplay: adplay.cpp

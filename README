@@ -1,5 +1,5 @@
-Introduction
-------------
+Description
+-----------
 AdPlay/Linux is AdPlug's Linux console-based frontend.
 
 Prerequisites
@@ -10,7 +10,6 @@ program:
 Library			Version
 -------			-------
 glibc				>= 2.1
-pthread			>= 0.8
 adplug			>= 1.1
 
 Installation
@@ -21,9 +20,12 @@ make
 
 This should build the adplay executable.
 
-Copy the adplay executable somewhere suitable into your directory structure,
-preferrably somewhere in your path, like /usr/local/bin. This should be done
-automatically in future.
+To install, do as superuser:
+
+make install
+
+This places the executable into /usr/local/bin. You can modify the target path
+by altering the makefile.
 
 After that, you can do as normal user:
 
@@ -36,6 +38,12 @@ make distclean
 to remove all files created at compile time or even eventually additional
 created files.
 
+If you later wish to uninstall AdPlay, you can do as superuser:
+
+make uninstall
+
+to remove the executable from /usr/local/bin.
+
 Usage
 -----
 Start adplay with at least one file to be played as parameter and you should
@@ -43,5 +51,5 @@ be set. Additional commandline parameters are explained by typing:
 
 adplay --help
 
-That's all for now. I'll work out this doc more completely, when it's time to
-make a release.
+That's all for now. A more detailed doc will follow when i get the time to
+write one. Any help is greatly appreciated!
