@@ -20,72 +20,73 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/soundcard.h>
+#include <string.h>
+#include <signal.h>
 #include <adplug/adplug.h>
 #include <adplug/emuopl.h>
 
 #include "getopt.h"
+#include "output.h"
+#include "oss.h"
+#include "null.h"
+#include "disk.h"
 
 // defines
 #define ADPLAY_VERSION	"AdPlay/UNIX " VERSION	// AdPlay/UNIX version string
 
-// defaults
-#define BUF_SIZE	512		// buffer size in samples
-#define FREQ		44100		// replay frequency
-#define CHANNELS	1		// number of channels
-#define BITS		16		// bit depth
-#define DEVICE		"/dev/dsp"	// audio device file
-#define ENDLESS		true		// play endlessly
-#define SHOWINSTS	false		// show instruments
-#define SONGINFO	false		// show song info
-#define SONGMESSAGE	false		// show song message
-#define SUBSONG		0		// default subsong
+// typedefs
+enum Outputs {null, oss, disk};
 
 // global variables
-CEmuopl *opl;			// global emulator object
-int audio_fd;			// audio device file
-const char *program_name;	// Program executable name
+static const char *program_name;	// Program executable name
+static Player *player = 0; // global player object
 
-// option variables
-int		buf_size=BUF_SIZE,freq=FREQ,channels=CHANNELS,bits=BITS;
-unsigned int	subsong=SUBSONG;
-char		*device=DEVICE;
-bool		endless=ENDLESS,showinsts=SHOWINSTS,songinfo=SONGINFO,songmessage=SONGMESSAGE;
+// Configuration (and defaults)
+static struct {
+  int buf_size, freq, channels, bits;
+  unsigned int subsong;
+  char *device;
+  bool endless, showinsts, songinfo, songmessage;
+  Outputs output;
+} cfg = { 512, 44100, 1, 16, 0, "/dev/dsp", true, false, false, false, oss };
 
-#ifndef min
-#define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif
-
-#define getsampsize (channels * (bits / 8))
-
-static void usage (int exit_status)
-/*
- * Print usage information and exit with exit_status.
- */
+static void usage(int exit_status)
+/* Print usage information and exit with exit_status. */
 {
-	puts(ADPLAY_VERSION " - OPL2 audio player");
-	printf("Usage: %s [OPTION]... [FILE]...\n",program_name);
-	printf("Options:\n\
-  -8, --8bit                 8-bit replay\n\
-      --16bit                16-bit replay\n\
-  -f, --freq=FREQ            set frequency to FREQ\n\
-      --stereo               stereo playback\n\
-      --mono                 mono playback\n\
-  -b, --buffer=SIZE          set buffer size to SIZE\n\
+  cout << "Usage: " << program_name << " [OPTION]... FILE..." << endl;
+  cout << "\
+Output selection:\n\
+  -O, --output=OUTPUT        Specify output mechanism:\n\
+                               oss, null, disk\n\
+\n\
+OSS driver (oss) specific:\n\
   -d, --device=FILE          set sound device file to FILE\n\
+  -b, --buffer=SIZE          set output buffer size to SIZE\n\
+\n\
+Disk writer (disk) specific:\n\
+  -d, --device=FILE          output to FILE\n\
+\n\
+Playback quality:\n\
+  -8, --8bit                 8-bit sample quality\n\
+      --16bit                16-bit sample quality\n\
+  -f, --freq=FREQ            set sample frequency to FREQ\n\
+      --stereo               stereo stream\n\
+      --mono                 mono stream\n\
+\n\
+Informative output:\n\
   -i, --instruments          display instrument names\n\
   -r, --realtime             display realtime song info\n\
   -m, --message              display song message\n\
+\n\
+Playback:
   -s, --subsong=N            play subsong number N\n\
   -o, --once                 play only once, don't loop\n\
+\n\
+Generic:\n\
   -h, --help                 display this help and exit\n\
-  -V, --version              output version information and exit\n");
+  -V, --version              output version information and exit" << endl;
 
-	exit(exit_status);
+  exit(exit_status);
 }
 
 static int decode_switches(int argc, char **argv)
@@ -110,120 +111,131 @@ static int decode_switches(int argc, char **argv)
     {"once",no_argument,NULL,'o'},		// don't loop
     {"help", no_argument, 0, 'h'},		// display help
     {"version", no_argument, 0, 'V'},		// version information
+    {"output",required_argument,NULL,'O'},	// output mechanism
     {NULL, 0, NULL, 0}				// end of options
   };
 
-  while ((c = getopt_long(argc, argv, "8f:b:d:irms:ohV", long_options, (int *) 0)) != EOF) {
+  while ((c = getopt_long(argc, argv, "8f:b:d:irms:ohVO:", long_options, (int *) 0)) != EOF) {
       switch (c) {
-      case '8': bits = 8; break;
-      case '1': bits = 16; break;
-      case 'f': freq = atoi(optarg); break;
-      case '3': channels = 2; break;
-      case '2': channels = 1; break;
-      case 'b': buf_size = atoi(optarg); break;
-      case 'd': device = optarg; break;
-      case 'i': showinsts = true; break;
-      case 'r': songinfo = true; break;
-      case 'm': songmessage = true; break;
-      case 's': subsong = atoi(optarg); break;
-      case 'o': endless = false; break;
+      case '8': cfg.bits = 8; break;
+      case '1': cfg.bits = 16; break;
+      case 'f': cfg.freq = atoi(optarg); break;
+      case '3': cfg.channels = 2; break;
+      case '2': cfg.channels = 1; break;
+      case 'b': cfg.buf_size = atoi(optarg); break;
+      case 'd': cfg.device = optarg; break;
+      case 'i': cfg.showinsts = true; break;
+      case 'r': cfg.songinfo = true; break;
+      case 'm': cfg.songmessage = true; break;
+      case 's': cfg.subsong = atoi(optarg); break;
+      case 'o': cfg.endless = false; break;
       case 'V': puts(ADPLAY_VERSION); exit(0);
-      case 'h':	usage(0);
-      default: usage(1);
+      case 'h':	usage(0); break;
+      case 'O':
+	if(!strcmp(optarg,"oss")) cfg.output = oss; else
+	  if(!strcmp(optarg,"null")) cfg.output = null; else
+	    if(!strcmp(optarg,"disk")) {
+	      cfg.output = disk;
+	      cfg.endless = false; // endless output is almost never desired here...
+	    } else {
+	      cout << program_name << ": unknown output method -- " << optarg << endl;
+	      exit(1);
+	    }
+	break;
       }
   }
 
   return optind;
 }
 
-void play(char *fn)
+static void play(const char *fn, Player *pl, unsigned int subsong)
+/* Start playback of subsong 'subsong' of file 'fn', using player 'player'. */
 {
-	CPlayer *p = CAdPlug::factory(fn,opl);
-	char *pos,*audiobuf;
-	long i,towrite,minicnt=0;
-	bool playing=true;
+  // initialize output & player
+  pl->get_opl()->init();
+  pl->p = CAdPlug::factory(fn,pl->get_opl());
 
-	if(!p) {
-		cout << program_name << ": " << fn << ": Unknown filetype" << endl;
-		return;
-	}
+  if(!pl->p) {
+    cout << program_name << ": unknown filetype -- " << fn << endl;
+    return;
+  }
 
-	p->rewind(subsong);
+  pl->p->rewind(subsong);
 
-	cout << "Playing '" << fn << "'..." << endl <<
-		"Type  : " << p->gettype() << endl <<
-		"Title : " << p->gettitle() << endl <<
-		"Author: " << p->getauthor() << endl << endl;
+  cout << "Playing '" << fn << "'..." << endl <<
+    "Type  : " << pl->p->gettype() << endl <<
+    "Title : " << pl->p->gettitle() << endl <<
+    "Author: " << pl->p->getauthor() << endl << endl;
 
-	if(showinsts) {		// display instruments
-		cout << "Instrument names:" << endl;
-		for(i=0;i<(long)p->getinstruments();i++)
-			cout << i << ": " << p->getinstrument(i) << endl;
-		cout << endl;
-	}
+  if(cfg.showinsts) {		// display instruments
+    cout << "Instrument names:" << endl;
+    for(unsigned long i=0;i<pl->p->getinstruments();i++)
+      cout << i << ": " << pl->p->getinstrument(i) << endl;
+    cout << endl;
+  }
 
-	if(songmessage) {	// display song message
-		cout << "Song message:" << endl;
-		cout << p->getdesc() << endl << endl;
-	}
+  if(cfg.songmessage) {	// display song message
+    cout << "Song message:" << endl;
+    cout << pl->p->getdesc() << endl << endl;
+  }
 
-	// play loop
-	audiobuf = new char [buf_size * getsampsize];
-	while(playing || endless) {
-		if(songinfo) {	// display song info
-			printf("Subsong: %d/%d, Order: %d/%d, Pattern: %d/%d, Row: %d, Speed: %d, Timer: %.2fHz     \r",
-				subsong,p->getsubsongs()-1,p->getorder(),p->getorders(),p->getpattern(),
-				p->getpatterns(),p->getrow(),p->getspeed(),p->getrefresh());
-		}
+  // play loop
+  do {
+    if(cfg.songinfo)	// display song info
+      printf("Subsong: %d/%d, Order: %d/%d, Pattern: %d/%d, Row: %d, Speed: %d, Timer: %.2fHz     \r",
+	     subsong,pl->p->getsubsongs()-1,pl->p->getorder(),pl->p->getorders(),
+	     pl->p->getpattern(),pl->p->getpatterns(),pl->p->getrow(),
+	     pl->p->getspeed(),pl->p->getrefresh());
 
-		towrite = buf_size; pos = audiobuf;
-		while(towrite > 0) {
-			while(minicnt < 0)
-			{
-				minicnt += freq;
-				playing = p->update();
-			}
-			i = min(towrite,(long)(minicnt/p->getrefresh()+4)&~3);
-			opl->update((short *)pos, i);
-			pos += i * getsampsize; towrite -= i;
-			minicnt -= (long)(p->getrefresh()*i);
-		}
-		write(audio_fd, audiobuf, buf_size*getsampsize);
-	}
+    pl->frame();
+  } while(pl->playing || cfg.endless);
+}
 
-	delete [] audiobuf;
-	delete p;
+static void shutdown(void)
+/* General deinitialization handler. */
+{
+  if(player) delete player;
+}
+
+static void sighandler(int signal)
+/* Handles all kinds of signals. */
+{
+  switch(signal) {
+  case SIGINT:
+  case SIGTERM:
+    exit(0);
+  }
 }
 
 int main(int argc, char **argv)
 {
-  int	optind,i,format;
+  int optind,i;
+
+  // init
+  program_name = argv[0];
+  atexit(shutdown);
+  signal(SIGINT, sighandler); signal(SIGTERM, sighandler);
 
   // parse commandline
-  program_name = argv[0];
   optind = decode_switches(argc,argv);
-  if(optind == argc) usage(1);			// no filename given
-  if(argc - optind > 1) endless = false;	// more than 1 file given
-
-  // open OSS audio device
-  if((audio_fd = open(device, O_WRONLY, 0)) == -1) {
-    perror(device);
-    exit(EXIT_FAILURE);
+  if(optind == argc) {	// no filename given
+    cout << program_name << ": need at least one file for playback!" << endl;
+    usage(1);
   }
-  format = (bits == 16 ? AFMT_S16_LE : AFMT_S8);
-  ioctl(audio_fd, SNDCTL_DSP_SETFMT, &format);
-  ioctl(audio_fd, SOUND_PCM_WRITE_CHANNELS, &channels);
-  ioctl(audio_fd, SNDCTL_DSP_SPEED, &freq);
+  if(argc - optind > 1) cfg.endless = false;	// more than 1 file given
 
-  // main loop
-  opl = new CEmuopl(freq,bits == 16,channels == 2);
-  for(i=optind;i<argc;i++) {	// play all files from commandline
-    opl->init();
-    play(argv[i]);
+  // init player
+  switch(cfg.output) {
+  case oss: player = new OSSPlayer(cfg.device, cfg.bits, cfg.channels, cfg.freq, cfg.buf_size); break;
+  case null: player = new NullOutput(); break;
+  case disk: player = new DiskWriter(cfg.device, cfg.bits, cfg.channels, cfg.freq); break;
+  default: exit(1);
   }
+
+  // play all files from commandline
+  for(i=optind;i<argc;i++)
+    play(argv[i],player,cfg.subsong);
 
   // deinit
-  delete opl;
-  close(audio_fd);
   exit(0);
 }
