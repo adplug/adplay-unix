@@ -11,3 +11,5 @@ adplay_DEPENDENCIES = @drivers@
 man_MANS = adplay.1
 
 EXTRA_DIST = $(man_MANS)
+
+AUTOMAKE_OPTIONS = dist-bzip2
