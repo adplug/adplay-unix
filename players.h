@@ -46,18 +46,18 @@ enum Outputs {none, null, oss, disk, esound};
 #define DEFAULT_DRIVER disk
 #endif
 
-// EsounD driver
-#ifdef DRIVER_ESOUND
-#include "esound.h"
-#undef DEFAULT_DRIVER
-#define DEFAULT_DRIVER esound
-#endif
-
 // OSS driver
 #ifdef DRIVER_OSS
 #include "oss.h"
 #undef DEFAULT_DRIVER
 #define DEFAULT_DRIVER oss
+#endif
+
+// EsounD driver
+#ifdef DRIVER_ESOUND
+#include "esound.h"
+#undef DEFAULT_DRIVER
+#define DEFAULT_DRIVER esound
 #endif
 
 #endif
