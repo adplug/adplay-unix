@@ -101,6 +101,9 @@ static void usage()
 	 "  -d, --device=URL           URL to EsounD server host (hostname:port)\n\n"
 	 "SDL driver (sdl) specific:\n"
 	 "  -b, --buffer=SIZE          set output buffer size to SIZE\n\n"
+	 "ALSA driver (alsa) specific:\n"
+	 "  -d, --device=DEVICE        set sound device to DEVICE\n"
+	 "  -b, --buffer=SIZE          set output buffer size to SIZE\n\n"
 	 "Playback quality:\n"
 	 "  -8, --8bit                 8-bit sample quality\n"
 	 "      --16bit                16-bit sample quality\n"
@@ -141,6 +144,9 @@ static void usage()
 #endif
 #ifdef DRIVER_SDL
 	 "sdl "
+#endif
+#ifdef DRIVER_ALSA
+	 "alsa "
 #endif
 	 "\n");
 }
@@ -197,17 +203,18 @@ static int decode_switches(int argc, char **argv)
 	break;
       case 'O':
 	if(!strcmp(optarg,"oss")) cfg.output = oss; else
-	  if(!strcmp(optarg,"null")) cfg.output = null; else
-	    if(!strcmp(optarg,"disk")) {
-	      cfg.output = disk;
-	      cfg.endless = false; // endless output is almost never desired here...
-	    } else
-	      if(!strcmp(optarg,"esound")) cfg.output = esound; else
-                if (!strcmp(optarg,"qsa")) cfg.output = qsa; else
-                   if (!strcmp(optarg,"sdl")) cfg.output = sdl; else {
-		message(MSG_ERROR, "unknown output method -- %s", optarg);
-		exit(EXIT_FAILURE);
-	      }
+	if(!strcmp(optarg,"null")) cfg.output = null; else
+	if(!strcmp(optarg,"disk")) {
+	  cfg.output = disk;
+	  cfg.endless = false; // endless output is almost never desired here
+	} else
+	if(!strcmp(optarg,"esound")) cfg.output = esound; else
+        if(!strcmp(optarg,"qsa")) cfg.output = qsa; else
+	if(!strcmp(optarg,"alsa")) cfg.output = alsa; else
+	if(!strcmp(optarg,"sdl")) cfg.output = sdl; else {
+	  message(MSG_ERROR, "unknown output method -- %s", optarg);
+	  exit(EXIT_FAILURE);
+	}
 	break;
       case 'q': if(cfg.message_level) cfg.message_level--; break;
       case 'v': cfg.message_level++; break;
@@ -344,6 +351,12 @@ int main(int argc, char **argv)
 #ifdef DRIVER_SDL
   case sdl:
     player = new SDLPlayer(cfg.bits, cfg.channels, cfg.freq, cfg.buf_size);
+    break;
+#endif
+#ifdef DRIVER_ALSA
+  case alsa:
+    player = new ALSAPlayer(cfg.device, cfg.bits, cfg.channels, cfg.freq,
+			    cfg.buf_size);
     break;
 #endif
   default:

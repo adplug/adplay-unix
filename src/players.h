@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001, 2002 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2003 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include "config.h"
 
 // Enumerate ALL outputs (regardless of availability)
-enum Outputs {none, null, oss, disk, esound, qsa, sdl};
+enum Outputs {none, null, oss, disk, esound, qsa, sdl, alsa};
 
 #define DEFAULT_DRIVER none
 
@@ -46,6 +46,13 @@ enum Outputs {none, null, oss, disk, esound, qsa, sdl};
 #define DEFAULT_DRIVER disk
 #endif
 
+// SDL driver
+#ifdef DRIVER_SDL
+#include "sdl.h"
+#undef DEFAULT_DRIVER
+#define DEFAULT_DRIVER sdl
+#endif
+
 // OSS driver
 #ifdef DRIVER_OSS
 #include "oss.h"
@@ -53,11 +60,11 @@ enum Outputs {none, null, oss, disk, esound, qsa, sdl};
 #define DEFAULT_DRIVER oss
 #endif
 
-// EsounD driver
-#ifdef DRIVER_ESOUND
-#include "esound.h"
+// ALSA driver
+#ifdef DRIVER_ALSA
+#include "alsa.h"
 #undef DEFAULT_DRIVER
-#define DEFAULT_DRIVER esound
+#define DEFAULT_DRIVER alsa
 #endif
 
 // QSA driver
@@ -67,11 +74,11 @@ enum Outputs {none, null, oss, disk, esound, qsa, sdl};
 #define DEFAULT_DRIVER qsa
 #endif
 
-// SDL driver
-#ifdef DRIVER_SDL
-#include "sdl.h"
+// EsounD driver
+#ifdef DRIVER_ESOUND
+#include "esound.h"
 #undef DEFAULT_DRIVER
-#define DEFAULT_DRIVER sdl
+#define DEFAULT_DRIVER esound
 #endif
 
 #endif

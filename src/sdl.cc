@@ -28,19 +28,19 @@ SDLPlayer::SDLPlayer(unsigned char bits, int channels, int freq,
 {
    memset(&spec, 0x00, sizeof(SDL_AudioSpec));
 
-   if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+   if(SDL_Init(SDL_INIT_AUDIO) < 0) {
       message(MSG_ERROR, "unable to initialize SDL -- %s", SDL_GetError());
       exit(EXIT_FAILURE);
    }
 
    spec.freq = freq;
-   if (bits == 16) spec.format = AUDIO_S16SYS; else spec.format = AUDIO_U8;
+   if(bits == 16) spec.format = AUDIO_S16SYS; else spec.format = AUDIO_U8;
    spec.channels = channels;
    spec.samples = bufsize;
    spec.callback = SDLPlayer::callback;
    spec.userdata = this;
 
-   if (SDL_OpenAudio(&spec, NULL) < 0) {
+   if(SDL_OpenAudio(&spec, NULL) < 0) {
       message(MSG_ERROR, "unable to open audio -- %s", SDL_GetError());
       exit(EXIT_FAILURE);
    }
@@ -50,7 +50,7 @@ SDLPlayer::SDLPlayer(unsigned char bits, int channels, int freq,
 
 SDLPlayer::~SDLPlayer()
 {
-  if (!SDL_WasInit(SDL_INIT_AUDIO)) return;
+  if(!SDL_WasInit(SDL_INIT_AUDIO)) return;
 
   SDL_CloseAudio();
   SDL_Quit();
