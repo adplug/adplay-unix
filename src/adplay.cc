@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001 - 2003 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2004 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,17 @@
 #include <adplug/emuopl.h>
 #include <adplug/kemuopl.h>
 
+/*
+ * Apple (OS X) and Sun systems declare getopt in unistd.h, other systems
+ * (Linux) use getopt.h.
+ */
+#if defined ( __APPLE__ ) || ( defined (__SVR4) && defined (__sun) )
+#       include <unistd.h>
+#else
+#       include "getopt.h"
+#endif
+
 #include "defines.h"
-#include "getopt.h"
 #include "output.h"
 #include "players.h"
 
