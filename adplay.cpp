@@ -54,11 +54,10 @@ char	*device=DEVICE;
 bool	endless=ENDLESS,showinsts=SHOWINSTS;
 
 #ifndef min
-#define min(a,b)  (((a) < (b)) ? (a) : (b))
+#define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif
 
-inline int getsampsize()
-{ return (channels * (bits / 8)); }
+#define getsampsize (channels * (bits / 8))
 
 void display_usage()
 {
