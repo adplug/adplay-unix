@@ -22,9 +22,9 @@
 
 #define DEFAULT_DEVICE	"plughw:0,0"	// Default ALSA output device
 
-ALSAPlayer::ALSAPlayer(const char *device, unsigned char bits, int channels,
-		       int freq, unsigned long bufsize)
-  : EmuPlayer(bits, channels, freq, bufsize)
+ALSAPlayer::ALSAPlayer(Copl *nopl, const char *device, unsigned char bits,
+		       int channels, int freq, unsigned long bufsize)
+  : EmuPlayer(nopl, bits, channels, freq, bufsize)
 {
   snd_pcm_hw_params_t	*hwparams;
   unsigned int		nfreq = freq, err;

@@ -29,7 +29,7 @@
 class ALSAPlayer: public EmuPlayer
 {
 public:
-  ALSAPlayer(const char *device, unsigned char bits, int channels,
+  ALSAPlayer(Copl *nopl, const char *device, unsigned char bits, int channels,
 	     int freq, unsigned long bufsize);
   virtual ~ALSAPlayer();
 

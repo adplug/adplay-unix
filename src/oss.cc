@@ -29,9 +29,9 @@
 
 #define DEFAULT_DEVICE	"/dev/dsp"	// Default output device file
 
-OSSPlayer::OSSPlayer(const char *device, unsigned char bits, int channels,
-		     int freq, unsigned long bufsize)
-  : EmuPlayer(bits, channels, freq, bufsize)
+OSSPlayer::OSSPlayer(Copl *nopl, const char *device, unsigned char bits,
+		     int channels, int freq, unsigned long bufsize)
+  : EmuPlayer(nopl, bits, channels, freq, bufsize)
 {
   int format = (bits == 16 ? AFMT_S16_LE : AFMT_S8);
 

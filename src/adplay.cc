@@ -24,6 +24,7 @@
 #include <signal.h>
 #include <adplug/adplug.h>
 #include <adplug/emuopl.h>
+#include <adplug/kemuopl.h>
 
 #include "defines.h"
 #include "getopt.h"
@@ -45,27 +46,34 @@
 #  define ADPLUGDB_PATH		ADPLUGDB_FILE
 #endif
 
+/***** Typedefs *****/
+
+typedef enum { Emu_Satoh, Emu_Ken } EmuType;
+
 /***** Global variables *****/
 
 static const char	*program_name;
 static Player		*player = 0;		// global player object
 static CAdPlugDatabase	mydb;
+static Copl		*opl = 0;
 
 /***** Configuration (and defaults) *****/
 
 static struct {
-  int buf_size, freq, channels, bits, message_level;
-  unsigned int subsong;
-  const char *device;
-  char *userdb;
-  bool endless, showinsts, songinfo, songmessage;
-  Outputs output;
+  int			buf_size, freq, channels, bits, message_level;
+  unsigned int		subsong;
+  const char		*device;
+  char			*userdb;
+  bool			endless, showinsts, songinfo, songmessage;
+  EmuType		emutype;
+  Outputs		output;
 } cfg = {
   512, 44100, 1, 16, MSG_NOTE,
   0,
   NULL,
   NULL,
   true, false, false, false,
+  Emu_Satoh,
   DEFAULT_DRIVER
 };
 
@@ -91,7 +99,8 @@ static void usage()
 {
   printf("Usage: %s [OPTION]... FILE...\n\n"
 	 "Output selection:\n"
-	 "  -O, --output=OUTPUT        Specify output mechanism.\n\n"
+	 "  -e, --emulator=EMULATOR    specify emulator to use\n"
+	 "  -O, --output=OUTPUT        specify output mechanism\n\n"
 	 "OSS driver (oss) specific:\n"
 	 "  -d, --device=FILE          set sound device file to FILE\n"
 	 "  -b, --buffer=SIZE          set output buffer size to SIZE\n\n"
@@ -126,6 +135,7 @@ static void usage()
 	 program_name);
 
   // Print list of available output mechanisms
+  printf("Available emulators: satoh ken\n");
   printf("Available output mechanisms: "
 #ifdef DRIVER_OSS
 	 "oss "
@@ -173,6 +183,7 @@ static int decode_switches(int argc, char **argv)
     {"once", no_argument, NULL, 'o'},		// don't loop
     {"help", no_argument, NULL, 'h'},		// display help
     {"version", no_argument, NULL, 'V'},	// version information
+    {"emulator", required_argument, NULL, 'e'},	// emulator to use
     {"output", required_argument, NULL, 'O'},	// output mechanism
     {"database", required_argument, NULL, 'D'},	// different database
     {"quiet", no_argument, NULL, 'q'},		// be more quiet
@@ -180,7 +191,7 @@ static int decode_switches(int argc, char **argv)
     {NULL, 0, NULL, 0}				// end of options
   };
 
-  while ((c = getopt_long(argc, argv, "8f:b:d:irms:ohVO:D:qv",
+  while ((c = getopt_long(argc, argv, "8f:b:d:irms:ohVe:O:D:qv",
 			  long_options, (int *)0)) != EOF) {
       switch (c) {
       case '8': cfg.bits = 8; break;
@@ -202,20 +213,28 @@ static int decode_switches(int argc, char **argv)
 	  message(MSG_WARN, "could not open database -- %s", optarg);
 	break;
       case 'O':
-	if(!strcmp(optarg,"oss")) cfg.output = oss; else
-	if(!strcmp(optarg,"null")) cfg.output = null; else
-	if(!strcmp(optarg,"disk")) {
+	if(!strcmp(optarg,"oss")) cfg.output = oss;
+	else if(!strcmp(optarg,"null")) cfg.output = null;
+	else if(!strcmp(optarg,"disk")) {
 	  cfg.output = disk;
 	  cfg.endless = false; // endless output is almost never desired here
-	} else
-	if(!strcmp(optarg,"esound")) cfg.output = esound; else
-        if(!strcmp(optarg,"qsa")) cfg.output = qsa; else
-	if(!strcmp(optarg,"alsa")) cfg.output = alsa; else
-	if(!strcmp(optarg,"sdl")) cfg.output = sdl; else {
+	}
+	else if(!strcmp(optarg,"esound")) cfg.output = esound;
+	else if(!strcmp(optarg,"qsa")) cfg.output = qsa;
+	else if(!strcmp(optarg,"alsa")) cfg.output = alsa;
+	else if(!strcmp(optarg,"sdl")) cfg.output = sdl;
+	else {
 	  message(MSG_ERROR, "unknown output method -- %s", optarg);
 	  exit(EXIT_FAILURE);
 	}
 	break;
+      case 'e':
+	if(!strcmp(optarg, "satoh")) cfg.emutype = Emu_Satoh;
+	else if(!strcmp(optarg, "ken")) cfg.emutype = Emu_Ken;
+	else {
+	  message(MSG_ERROR, "unknown emulator -- %s", optarg);
+	  exit(EXIT_FAILURE);
+	}
       case 'q': if(cfg.message_level) cfg.message_level--; break;
       case 'v': cfg.message_level++; break;
       }
@@ -273,6 +292,7 @@ static void shutdown(void)
 /* General deinitialization handler. */
 {
   if(player) delete player;
+  if(opl) delete opl;
 }
 
 static void sighandler(int signal)
@@ -317,6 +337,16 @@ int main(int argc, char **argv)
   }
   if(argc - optind > 1) cfg.endless = false;	// more than 1 file given
 
+  // init emulator
+  switch(cfg.emutype) {
+  case Emu_Satoh:
+    opl = new CEmuopl(cfg.freq, cfg.bits == 16, cfg.channels == 2);
+    break;
+  case Emu_Ken:
+    opl = new CKemuopl(cfg.freq, cfg.bits == 16, cfg.channels == 2);
+    break;
+  }
+
   // init player
   switch(cfg.output) {
   case none:
@@ -324,7 +354,7 @@ int main(int argc, char **argv)
     exit(EXIT_FAILURE);
 #ifdef DRIVER_OSS
   case oss:
-    player = new OSSPlayer(cfg.device, cfg.bits, cfg.channels, cfg.freq,
+    player = new OSSPlayer(opl, cfg.device, cfg.bits, cfg.channels, cfg.freq,
 			   cfg.buf_size);
     break;
 #endif
@@ -335,27 +365,28 @@ int main(int argc, char **argv)
 #endif
 #ifdef DRIVER_DISK
   case disk:
-    player = new DiskWriter(cfg.device, cfg.bits, cfg.channels, cfg.freq);
+    player = new DiskWriter(opl, cfg.device, cfg.bits, cfg.channels, cfg.freq);
     break;
 #endif
 #ifdef DRIVER_ESOUND
   case esound:
-    player = new EsoundPlayer(cfg.bits, cfg.channels, cfg.freq, cfg.device);
+    player = new EsoundPlayer(opl, cfg.bits, cfg.channels, cfg.freq,
+			      cfg.device);
     break;
 #endif
 #ifdef DRIVER_QSA
   case qsa:
-    player = new QSAPlayer(cfg.bits, cfg.channels, cfg.freq);
+    player = new QSAPlayer(opl, cfg.bits, cfg.channels, cfg.freq);
     break;
 #endif
 #ifdef DRIVER_SDL
   case sdl:
-    player = new SDLPlayer(cfg.bits, cfg.channels, cfg.freq, cfg.buf_size);
+    player = new SDLPlayer(opl, cfg.bits, cfg.channels, cfg.freq, cfg.buf_size);
     break;
 #endif
 #ifdef DRIVER_ALSA
   case alsa:
-    player = new ALSAPlayer(cfg.device, cfg.bits, cfg.channels, cfg.freq,
+    player = new ALSAPlayer(opl, cfg.device, cfg.bits, cfg.channels, cfg.freq,
 			    cfg.buf_size);
     break;
 #endif

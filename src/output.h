@@ -21,7 +21,6 @@
 #define H_OUTPUT
 
 #include <adplug/player.h>
-#include <adplug/emuopl.h>
 
 class Player
 {
@@ -39,18 +38,18 @@ public:
 class EmuPlayer: public Player
 {
 private:
-  CEmuopl	opl;
+  Copl		*opl;
   char		*audiobuf;
   unsigned long	buf_size, freq;
   unsigned char	bits, channels;
 
 public:
-  EmuPlayer(unsigned char nbits, unsigned char nchannels, unsigned long nfreq,
-	    unsigned long nbufsize);
+  EmuPlayer(Copl *nopl, unsigned char nbits, unsigned char nchannels,
+	    unsigned long nfreq, unsigned long nbufsize);
   virtual ~EmuPlayer();
 
   virtual void frame();
-  virtual Copl *get_opl() { return &opl; }
+  virtual Copl *get_opl() { return opl; }
 
 protected:
   virtual void output(const void *buf, unsigned long size) = 0;

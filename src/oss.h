@@ -25,7 +25,7 @@
 class OSSPlayer: public EmuPlayer
 {
 public:
-  OSSPlayer(const char *device, unsigned char bits, int channels,
+  OSSPlayer(Copl *nopl, const char *device, unsigned char bits, int channels,
 	    int freq, unsigned long bufsize);
   virtual ~OSSPlayer();
 

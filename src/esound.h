@@ -25,7 +25,8 @@
 class EsoundPlayer: public EmuPlayer
 {
 public:
-  EsoundPlayer(unsigned char bits, int channels, int freq, const char *url = 0);
+  EsoundPlayer(Copl *nopl, unsigned char bits, int channels, int freq,
+	       const char *url = 0);
   virtual ~EsoundPlayer();
 
 protected:

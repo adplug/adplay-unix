@@ -18,6 +18,8 @@
  */
 
 #include <stdio.h>
+#include <adplug/emuopl.h>
+#include <adplug/kemuopl.h>
 
 #include "output.h"
 #include "defines.h"
@@ -36,10 +38,9 @@ Player::~Player()
 
 /***** EmuPlayer *****/
 
-EmuPlayer::EmuPlayer(unsigned char nbits, unsigned char nchannels,
+EmuPlayer::EmuPlayer(Copl *nopl, unsigned char nbits, unsigned char nchannels,
 		     unsigned long nfreq, unsigned long nbufsize)
-  : opl(nfreq, nbits == 16, nchannels == 2), buf_size(nbufsize), freq(nfreq),
-    bits(nbits), channels(nchannels)
+  : opl(nopl), buf_size(nbufsize), freq(nfreq), bits(nbits), channels(nchannels)
 {
   audiobuf = new char [buf_size * getsampsize()];
 }
@@ -62,7 +63,7 @@ void EmuPlayer::frame()
       playing = p->update();
     }
     i = min(towrite, (long)(minicnt / p->getrefresh() + 4) & ~3);
-    opl.update((short *)pos, i);
+    opl->update((short *)pos, i);
     pos += i * getsampsize(); towrite -= i;
     minicnt -= (long)(p->getrefresh() * i);
   }

@@ -22,9 +22,9 @@
 #include "sdl.h"
 #include "defines.h"
 
-SDLPlayer::SDLPlayer(unsigned char bits, int channels, int freq,
+SDLPlayer::SDLPlayer(Copl *nopl, unsigned char bits, int channels, int freq,
 		     unsigned long bufsize)
-  : opl(freq, bits == 16, channels == 2)
+  : opl(nopl)
 {
    memset(&spec, 0x00, sizeof(SDL_AudioSpec));
 
@@ -76,7 +76,7 @@ void SDLPlayer::callback(void *userdata, Uint8 *audiobuf, int len)
       self->playing = self->p->update();
     }
     i = min(towrite, (long)(minicnt / self->p->getrefresh() + 4) & ~3);
-    self->opl.update((short *)pos, i);
+    self->opl->update((short *)pos, i);
     pos += i * self->getsampsize(); towrite -= i;
     minicnt -= (long)(self->p->getrefresh() * i);
   }

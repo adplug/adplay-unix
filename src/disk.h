@@ -27,8 +27,8 @@
 class DiskWriter: public EmuPlayer
 {
 public:
-  DiskWriter(const char *filename, unsigned char nbits, unsigned char nchannels,
-	     unsigned long nfreq);
+  DiskWriter(Copl *nopl, const char *filename, unsigned char nbits,
+	     unsigned char nchannels, unsigned long nfreq);
   virtual ~DiskWriter();
 
 protected:

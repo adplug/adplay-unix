@@ -24,9 +24,9 @@
 #include "defines.h"
 #include "esound.h"
 
-EsoundPlayer::EsoundPlayer(unsigned char bits, int channels, int freq,
-			   const char *url)
-  : EmuPlayer(bits, channels, freq, ESD_BUF_SIZE)
+EsoundPlayer::EsoundPlayer(Copl *nopl, unsigned char bits, int channels,
+			   int freq, const char *url)
+  : EmuPlayer(nopl, bits, channels, freq, ESD_BUF_SIZE)
 {
   socket = esd_play_stream((bits == 16 ? ESD_BITS16 : ESD_BITS8) |
 			   (channels == 2 ? ESD_STEREO : ESD_MONO) |
