@@ -1,5 +1,8 @@
 This is a brief overview of user-visible changes in adplay.
 
+Changes for version 1.5:
+	- None yet.
+
 Changes for version 1.4:
 	- Added the following output mechanisms:
 		- alsa: Advanced Linux Sound Architecture (ALSA) driver
