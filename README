@@ -1,38 +1,47 @@
 Introduction
 ------------
+AdPlay/Linux is AdPlug's Linux console-based frontend.
 
-Hey there!
-
-This is just a quickly hacked player for Linux. It produces 44.1khz,
-16-bit mono output on /dev/dsp. There are no command-line switches
-yet, else than the filename to play. Formats are auto-detected. You
-could try to change the output format, but you would have to change
-the source for this (just altering #define's won't work).
-
-To compile, have AdPlug library sources at hand. Edit makefile to tune
-path information and first "make players", then "make".
-
-I'm working on a fully fledged linux console AdPlay, though!
-Stay tuned!
-
-Simon
-
-License (GPL)
+Prerequisites
 -------------
+The following libraries and/or programs are needed in order to compile this
+program:
 
-AdPlay/Linux - Replayer for many OPL2/OPL3 audio file formats.
-Copyright (C) 2001 Simon Peter <dn.tlp@gmx.net>, et al.
+Library			Version
+-------			-------
+glibc				>= 2.1
+pthread			>= 0.8
+adplug			>= 1.1
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+Installation
+------------
+To compile the program, do as normal user:
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+make
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+This should build the adplay executable.
+
+Copy the adplay executable somewhere suitable into your directory structure,
+preferrably somewhere in your path, like /usr/local/bin. This should be done
+automatically in future.
+
+After that, you can do as normal user:
+
+make clean
+
+or even:
+
+make distclean
+
+to remove all files created at compile time or even eventually additional
+created files.
+
+Usage
+-----
+Start adplay with at least one file to be played as parameter and you should
+be set. Additional commandline parameters are explained by typing:
+
+adplay --help
+
+That's all for now. I'll work out this doc more completely, when it's time to
+make a release.
