@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001, 2002 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2003 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,18 @@
 #include "output.h"
 #include "players.h"
 
-#define DEFAULT_DATABASE	"/usr/local/share/adplug/adplug.db"
+// Default file name of AdPlug's database file
+#define ADPLUGDB_FILE		"adplug.db"
+
+// Default AdPlug user's configuration subdirectory
+#define ADPLUG_CONFDIR		".adplug"
+
+// Default path to AdPlug's system-wide database file
+#ifdef ADPLUG_DATA_DIR
+#  define ADPLUGDB_PATH		ADPLUG_DATA_DIR "/" ADPLUGDB_FILE
+#else
+#  define ADPLUGDB_PATH		ADPLUGDB_FILE
+#endif
 
 /***** global variables *****/
 const char *program_name;
@@ -40,13 +51,17 @@ static Player *player = 0;		// global player object
 static struct {
   int buf_size, freq, channels, bits;
   unsigned int subsong;
-  const char *device, *database;
+  const char *device;
+  const char *database;
+  char *userdb;
   bool endless, showinsts, songinfo, songmessage;
   Outputs output;
 } cfg = {
   512, 44100, 1, 16,
   0,
-  0, DEFAULT_DATABASE,
+  NULL,
+  ADPLUGDB_PATH,
+  NULL,
   true, false, false, false,
   DEFAULT_DRIVER
 };
@@ -218,6 +233,7 @@ static void shutdown(void)
 /* General deinitialization handler. */
 {
   if(player) delete player;
+  if(cfg.userdb) free(cfg.userdb);
 }
 
 static void sighandler(int signal)
@@ -236,11 +252,21 @@ int main(int argc, char **argv)
 {
   CAdPlugDatabase	mydb;
   int			optind, i;
+  const char		*homedir;
 
   // init
   program_name = argv[0];
   atexit(shutdown);
   signal(SIGINT, sighandler); signal(SIGTERM, sighandler);
+
+  // Try user's home directory first, before trying the default location.
+  homedir = getenv("HOME");
+  if(homedir) {
+    cfg.userdb = (char *)malloc(strlen(homedir) + strlen(ADPLUG_CONFDIR) +
+				strlen(ADPLUGDB_FILE) + 3);
+    strcpy(cfg.userdb, homedir); strcat(cfg.userdb, "/" ADPLUG_CONFDIR "/");
+    strcat(cfg.userdb, ADPLUGDB_FILE);
+  }
 
   // parse commandline
   optind = decode_switches(argc,argv);
@@ -274,8 +300,8 @@ int main(int argc, char **argv)
   }
 
   // init database
-  if(!mydb.load(cfg.database))
-    cout << program_name << ": could not load database -- " << cfg.database << endl;
+  if(cfg.userdb) mydb.load(cfg.userdb);
+  mydb.load(cfg.database);
   CAdPlug::set_database(&mydb);
 
   // play all files from commandline

@@ -62,11 +62,10 @@ void EmuPlayer::frame()
 
   // Prepare audiobuf with emulator output
   while(towrite > 0) {
-    while(minicnt < 0)
-      {
-	minicnt += freq;
-	playing = p->update();
-      }
+    while(minicnt < 0) {
+      minicnt += freq;
+      playing = p->update();
+    }
     i = min(towrite,(long)(minicnt/p->getrefresh()+4)&~3);
     opl.update((short *)pos, i);
     pos += i * getsampsize(); towrite -= i;
