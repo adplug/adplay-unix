@@ -1,0 +1,38 @@
+Introduction
+------------
+
+Hey there!
+
+This is just a quickly hacked player for Linux. It produces 44.1khz,
+16-bit mono output on /dev/dsp. There are no command-line switches
+yet, else than the filename to play. Formats are auto-detected. You
+could try to change the output format, but you would have to change
+the source for this (just altering #define's won't work).
+
+To compile, have AdPlug library sources at hand. Edit makefile to tune
+path information and first "make players", then "make".
+
+I'm working on a fully fledged linux console AdPlay, though!
+Stay tuned!
+
+Simon
+
+License (GPL)
+-------------
+
+AdPlay/Linux - Replayer for many OPL2/OPL3 audio file formats.
+Copyright (C) 2001 Simon Peter <dn.tlp@gmx.net>, et al.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
