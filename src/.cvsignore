@@ -1,0 +1,7 @@
+.deps
+.libs
+adplay
+Makefile
+Makefile.in
+config.h
+stamp-h?

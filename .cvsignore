@@ -1,7 +1,4 @@
-.deps
-.libs
 aclocal.m4
-adplay
 config.cache
 config.guess
 config.log
@@ -18,5 +15,3 @@ INSTALL
 autom4te.cache
 libtool
 ltmain.sh
-config.h
-stamp-h?
