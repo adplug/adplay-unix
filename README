@@ -1,39 +1,44 @@
+	adplay - OPL2 audio player
+
+  Copyright (C) 2001, 2002 Simon Peter
+
+  adplay is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
 Description
 -----------
-AdPlay/Linux is AdPlug's Linux/FreeBSD console-based frontend.
+adplay is AdPlug's UNIX console-based frontend.
 
 Prerequisites
 -------------
-The following libraries and/or programs are needed in order to compile this
-program:
+The following libraries are needed in order to compile this program:
 
-Program/Library		Version
----------------		-------
-glibc			>= 2.1
-adplug			>= 1.1
+Library		Version
+-------		-------
+adplug		>= 1.1
 
 Installation
 ------------
-To compile the program, do as normal user:
+See file INSTALL for instructions.
 
-make
+CVS
+---
+If you checked out from CVS, first run:
 
-This should build the adplay executable.
+./autogen.sh
 
-To install, do as superuser:
-
-make install
-
-This places the executable into /usr/local/bin. You can modify the target path
-by altering the makefile.
-
-Uninstallation
---------------
-If you wish to uninstall AdPlay, you can do as superuser:
-
-make uninstall
-
-to remove the executable from /usr/local/bin.
+to generate the build cruft and get the configure script.
 
 Usage
 -----
@@ -44,3 +49,5 @@ adplay --help
 
 That's all for now. A more detailed doc will follow when i get the time to
 write one. Any help is greatly appreciated!
+
+	- Simon Peter <dn.tlp@gmx.net>
