@@ -1,0 +1,100 @@
+.\"                              hey, Emacs:   -*- nroff -*-
+.\" adplay is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; see the file COPYING.  If not, write to
+.\" the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.TH ADPLAY 1 "March 13, 2002" GNU "AdPlay"
+.\" Please update the above date whenever this man page is modified.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins (default)
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+adplay \- OPL2 audio player
+.SH SYNOPSIS
+.B adplay
+.RI [ OPTION ]...
+FILE...
+.SH DESCRIPTION
+\fBadplay\fP is AdPlug's UNIX console-based frontend. It tries to play
+back all given FILEs.
+.PP
+\fBadplay\fP plays endlessly, if only one file is given. With multiple files,
+it plays them in a sequence and exits after the last file. The same can
+also be accomplished with only one file, by using the \fB-o\fP option.
+.SH EXIT STATUS
+\fBadplay\fP returns 0 on successful operation. 1 is returned otherwise.
+.SH OPTIONS
+\fBadplay\fP accepts the following options:
+.TP
+.B \-8, \-\-8bit
+Use only 8-bit samples for playback.
+.TP
+.B \-\-16bit
+Use only 16-bit samples for playback. This is the default.
+.TP
+.B \-f, \-\-freq=FREQ
+Set playback frequency to FREQ, in Hz. This is set to 44100Hz by default.
+.TP
+.B \-\-stereo
+Use only stereo samples for playback. The sound stream is just doubled, no
+further audio processing is done. This option is pretty useless, if you
+don't have obscure audio hardware that only accepts stereo streams, because
+the OPL2 only generates mono sound.
+.TP
+.B \-\-mono
+Use only mono samples for playback. This is the default.
+.TP
+.B \-b \-\-buffer=SIZE
+Set sound buffer size to SIZE samples. If you notice sound skipping with the
+default setting, try a greater buffer size. Note that this is measured in
+samples, not bytes! This is set to 512 samples by default.
+.TP
+.B \-d \-\-device=FILE
+Set sound output device file to FILE. Right now, only OSS compatible devices
+are supported. This is set to \fB/dev/dsp\fP by default.
+.TP
+.B \-i \-\-instruments
+Display instrument names (if available) after the file type information.
+.TP
+.B \-r \-\-realtime
+Display realtime playback informations, while playing. This will display a
+one-line status bar, containing essential playback information.
+.TP
+.B \-m \-\-message
+Display the song message (if available) after the file type information.
+.TP
+.B \-s \-\-subsong=N
+Play subsong number N, instead of the first subsong. Only useful for
+file formats that support multiple subsongs.
+.TP
+.B \-o \-\-once
+Play only once, don't loop. This will exit \fBadplay\fP after the song
+ended. This option is set by default, if multiple \fBFILEs\fP are given.
+.TP
+.B \-h, \-\-help
+Show summary of options.
+.TP
+.B \-V, \-\-version
+Show version of program.
+.SH "SEE ALSO"
+.BR adplug (3).
+.SH AUTHOR
+Simon Peter <dn.tlp@gmx.net>.
