@@ -1,6 +1,6 @@
 # Makefile for AdPlay/Linux, (c) 2001 Simon Peter <dn.tlp@gmx.net>
 
-CXX = c++
+CXX = gcc-3.0
 INSTALL = install
 
 CXXFLAGS = -Wall
