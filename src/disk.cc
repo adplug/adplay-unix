@@ -48,14 +48,17 @@ DiskWriter::DiskWriter(const char *filename, unsigned char nbits, unsigned char 
     exit(EXIT_FAILURE);
   }
 
-  f->setFlag(binio::BigEndian, false);
+  // Determine machine byte ordering
+  if(f->getFlag(binio::BigEndian))
+    f->writeString("RIFX", 4);
+  else
+    f->writeString("RIFF", 4);
 
   // Write Microsoft RIFF WAVE header
-  f->writeInt(0x46464952l, 4); f->writeInt(36, 4); f->writeInt(0x45564157l, 4);
-  f->writeInt(0x20746d66l, 4); f->writeInt(16, 4); f->writeInt(1, 2);
-  f->writeInt(nchannels, 2); f->writeInt(nfreq, 4);
+  f->writeInt(36, 4); f->writeString("WAVEfmt ", 8); f->writeInt(16, 4);
+  f->writeInt(1, 2); f->writeInt(nchannels, 2); f->writeInt(nfreq, 4);
   f->writeInt(nfreq * getsampsize(), 4); f->writeInt(getsampsize(), 2);
-  f->writeInt(nbits, 2); f->writeInt(0x61746164l, 4); f->writeInt(0, 4);
+  f->writeInt(nbits, 2); f->writeString("data", 4); f->writeInt(0, 4);
 }
 
 DiskWriter::~DiskWriter()
@@ -78,15 +81,6 @@ DiskWriter::~DiskWriter()
 
 void DiskWriter::output(const void *buf, unsigned long size)
 {
-  short		*sbuf = (short *)buf;
-  unsigned long	i;
-
-  // Write only little-endian on 16bit samples
-  if(bits == 2) {
-    for(i = 0; i < size / 2; i++)
-      f->writeInt(sbuf[i], 2);
-  } else
-    f->writeString((char *)buf, size);
-
+  f->writeString((char *)buf, size);
   samplesize += size;
 }

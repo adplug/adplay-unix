@@ -76,12 +76,12 @@ void EmuPlayer::frame()
   output(audiobuf, buf_size * getsampsize());
 }
 
-Copl *EmuPlayer::get_opl()
+inline Copl *EmuPlayer::get_opl()
 {
   return &opl;
 }
 
-unsigned char EmuPlayer::getsampsize()
+inline unsigned char EmuPlayer::getsampsize()
 {
   return (channels * (bits / 8));
 }
