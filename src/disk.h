@@ -20,8 +20,8 @@
 #ifndef H_DISK
 #define H_DISK
 
-#include <fstream>
-#include <binwrap.h>
+#include <binio.h>
+
 #include "output.h"
 
 class DiskWriter: public EmuPlayer
@@ -35,8 +35,7 @@ protected:
   virtual void output(const void *buf, unsigned long size);
 
 private:
-  binowstream	*f;
-  ofstream	out;
+  binostream	*f;
   unsigned long samplesize;
 };
 

@@ -18,11 +18,11 @@
  */
 
 #include <iostream>
-#include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <binwrap.h>
+#include <binfile.h>
 
 #include "defines.h"
 #include "disk.h"
@@ -31,52 +31,31 @@ DiskWriter::DiskWriter(const char *filename, unsigned char nbits, unsigned char 
 		       unsigned long nfreq)
   : EmuPlayer(nbits,nchannels,nfreq), f(0), samplesize(0)
 {
-  const struct {
-    unsigned long chunkid, chunksize, format, subchunk1id, subchunk1size;
-    unsigned short audioformat, numchannels;
-    unsigned long samplerate, byterate;
-    unsigned short blockalign, bitspersample;
-    unsigned long subchunk2id, subchunk2size;
-  } riff_header = { 0x46464952l, 36l, 0x45564157l, 0x20746d66l, 16l,
-		    1, nchannels,
-		    nfreq, nfreq * getsampsize(),
-		    getsampsize(), nbits,
-		    0x61746164l, 0l };
-
   if(!filename) {
-    fprintf(stderr, "%s: No output filename specified!\n", program_name);
+    message(MSG_ERROR, "no output filename specified");
     exit(EXIT_FAILURE);
   }
 
   // If filename is '-', output to stdout
-  if(strcmp(filename, "-")) {
-    out.open(filename, ios::out | ios::bin);
-    if(!out.is_open()) {
-      fprintf(stderr, "%s: Cannot open file for output -- %s\n", program_name,
-	      filename);
-      exit(EXIT_FAILURE);
-    }
-    f = new binowstream(&out);
-  } else {
+  if(strcmp(filename, "-"))
+    f = new binofstream(filename);
+  else
     f = new binowstream(&cout);
+
+  if(!f || f->error()) {
+    message(MSG_ERROR, "cannot open file for output -- %s", filename);
+    if(f) delete f;
+    exit(EXIT_FAILURE);
   }
 
   f->setFlag(binio::BigEndian, false);
 
   // Write Microsoft RIFF WAVE header
-  f->writeInt(riff_header.chunkid, 4);
-  f->writeInt(riff_header.chunksize, 4);
-  f->writeInt(riff_header.format, 4);
-  f->writeInt(riff_header.subchunk1id, 4);
-  f->writeInt(riff_header.subchunk1size, 4);
-  f->writeInt(riff_header.audioformat, 2);
-  f->writeInt(riff_header.numchannels, 2);
-  f->writeInt(riff_header.samplerate, 4);
-  f->writeInt(riff_header.byterate, 4);
-  f->writeInt(riff_header.blockalign, 2);
-  f->writeInt(riff_header.bitspersample, 2);
-  f->writeInt(riff_header.subchunk2id, 4);
-  f->writeInt(riff_header.subchunk2size, 4);
+  f->writeInt(0x46464952l, 4); f->writeInt(36, 4); f->writeInt(0x45564157l, 4);
+  f->writeInt(0x20746d66l, 4); f->writeInt(16, 4); f->writeInt(1, 2);
+  f->writeInt(nchannels, 2); f->writeInt(nfreq, 4);
+  f->writeInt(nfreq * getsampsize(), 4); f->writeInt(getsampsize(), 2);
+  f->writeInt(nbits, 2); f->writeInt(0x61746164l, 4); f->writeInt(0, 4);
 }
 
 DiskWriter::~DiskWriter()
@@ -95,7 +74,6 @@ DiskWriter::~DiskWriter()
 
   // end disk writing
   delete f;
-  out.close();
 }
 
 void DiskWriter::output(const void *buf, unsigned long size)

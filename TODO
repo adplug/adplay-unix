@@ -1,4 +1,5 @@
 AdPlay/UNIX To Do List:
 -----------------------
 - ALSA and maybe SDL output support. [dynamite]
-- Open database from user's home directory first. [dynamite]
+- Check if new disk writer code works on big-endian machines. [dynamite]
+- Update manpage. [dynamite]

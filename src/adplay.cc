@@ -17,9 +17,9 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
  */
 
-#include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <string.h>
 #include <signal.h>
 #include <adplug/adplug.h>
@@ -29,6 +29,8 @@
 #include "getopt.h"
 #include "output.h"
 #include "players.h"
+
+/***** Defines *****/
 
 // Default file name of AdPlug's database file
 #define ADPLUGDB_FILE		"adplug.db"
@@ -43,35 +45,51 @@
 #  define ADPLUGDB_PATH		ADPLUGDB_FILE
 #endif
 
-/***** global variables *****/
-const char *program_name;
-static Player *player = 0;		// global player object
+/***** Global variables *****/
 
-/***** configuration (and defaults) *****/
+static const char	*program_name;
+static Player		*player = 0;		// global player object
+static CAdPlugDatabase	mydb;
+
+/***** Configuration (and defaults) *****/
+
 static struct {
-  int buf_size, freq, channels, bits;
+  int buf_size, freq, channels, bits, message_level;
   unsigned int subsong;
   const char *device;
-  const char *database;
   char *userdb;
   bool endless, showinsts, songinfo, songmessage;
   Outputs output;
 } cfg = {
-  512, 44100, 1, 16,
+  512, 44100, 1, 16, MSG_NOTE,
   0,
   NULL,
-  ADPLUGDB_PATH,
   NULL,
   true, false, false, false,
   DEFAULT_DRIVER
 };
 
-/***** local functions *****/
+/***** Global functions *****/
+
+void message(int level, const char *fmt, ...)
+{
+  va_list argptr;
+
+  if(cfg.message_level < level) return;
+
+  fprintf(stderr, "%s: ", program_name);
+  va_start(argptr, fmt);
+  vfprintf(stderr, fmt, argptr);
+  va_end(argptr);
+  fprintf(stderr, "\n");
+}
+
+/***** Local functions *****/
 
 static void usage()
-/* Print usage information and exit with exit_status. */
+/* Print usage information. */
 {
-  cout << "Usage: " << program_name << " [OPTION]... FILE...\n\
+  printf("Usage: %s [OPTION]... FILE...\n\
 \n\
 Output selection:\n\
   -O, --output=OUTPUT        Specify output mechanism.\n\
@@ -81,7 +99,7 @@ OSS driver (oss) specific:\n\
   -b, --buffer=SIZE          set output buffer size to SIZE\n\
 \n\
 Disk writer (disk) specific:\n\
-  -d, --device=FILE          output to FILE\n\
+  -d, --device=FILE          output to FILE ('-' is stdout)\n\
 \n\
 EsounD driver (esound) specific:\n\
   -d, --device=URL           URL to EsounD server host (hostname:port)\n\
@@ -103,25 +121,28 @@ Playback:
   -o, --once                 play only once, don't loop\n\
 \n\
 Generic:\n\
-  -D, --database=FILE        Use database file FILE\n\
+  -D, --database=FILE        additionally use database file FILE\n\
+  -q, --quiet                be more quiet\n\
+  -v, --verbose              be more verbose\n\
   -h, --help                 display this help and exit\n\
-  -V, --version              output version information and exit" << endl << endl;
+  -V, --version              output version information and exit\n\n",
+	 program_name);
 
-  // Build list of available output mechanisms
-  cout << "Available output mechanisms: ";
+  // Print list of available output mechanisms
+  printf("Available output mechanisms: "
 #ifdef DRIVER_OSS
-  cout << "oss ";
+	 "oss "
 #endif
 #ifdef DRIVER_NULL
-  cout << "null ";
+	 "null "
 #endif
 #ifdef DRIVER_DISK
-  cout << "disk ";
+	 "disk "
 #endif
 #ifdef DRIVER_ESOUND
-  cout << "esound ";
+	 "esound "
 #endif
-  cout << endl;
+	 "\n");
 }
 
 static int decode_switches(int argc, char **argv)
@@ -132,26 +153,29 @@ static int decode_switches(int argc, char **argv)
 {
   int c;
   struct option const long_options[] = {
-    {"8bit",no_argument,NULL,'8'},		// 8-bit replay
-    {"16bit",no_argument,NULL,'1'},		// 16-bit replay
-    {"freq",required_argument,NULL,'f'},	// set frequency
-    {"stereo",no_argument,NULL,'3'},		// stereo replay
-    {"mono",no_argument,NULL,'2'},		// mono replay
-    {"buffer",required_argument,NULL,'b'},	// buffer size
-    {"device",required_argument,NULL,'d'},	// device file
-    {"instruments",no_argument,NULL,'i'},	// show instruments
-    {"realtime",no_argument,NULL,'r'},		// realtime song info
-    {"message",no_argument,NULL,'m'},		// song message
-    {"subsong",no_argument,NULL,'s'},		// play subsong
-    {"once",no_argument,NULL,'o'},		// don't loop
-    {"help",no_argument,NULL,'h'},		// display help
-    {"version",no_argument,NULL,'V'},		// version information
-    {"output",required_argument,NULL,'O'},	// output mechanism
-    {"database",required_argument,NULL,'D'},	// different database
+    {"8bit", no_argument, NULL, '8'},		// 8-bit replay
+    {"16bit", no_argument, NULL, '1'},		// 16-bit replay
+    {"freq", required_argument, NULL, 'f'},	// set frequency
+    {"stereo", no_argument, NULL, '3'},		// stereo replay
+    {"mono", no_argument, NULL, '2'},		// mono replay
+    {"buffer", required_argument, NULL, 'b'},	// buffer size
+    {"device", required_argument, NULL, 'd'},	// device file
+    {"instruments", no_argument, NULL, 'i'},	// show instruments
+    {"realtime", no_argument, NULL, 'r'},	// realtime song info
+    {"message", no_argument, NULL, 'm'},	// song message
+    {"subsong", no_argument, NULL, 's'},	// play subsong
+    {"once", no_argument, NULL, 'o'},		// don't loop
+    {"help", no_argument, NULL, 'h'},		// display help
+    {"version", no_argument, NULL, 'V'},	// version information
+    {"output", required_argument, NULL, 'O'},	// output mechanism
+    {"database", required_argument, NULL, 'D'},	// different database
+    {"quiet", no_argument, NULL, 'q'},		// be more quiet
+    {"verbose", no_argument, NULL, 'v'},	// be more verbose
     {NULL, 0, NULL, 0}				// end of options
   };
 
-  while ((c = getopt_long(argc, argv, "8f:b:d:irms:ohVO:D:", long_options, (int *) 0)) != EOF) {
+  while ((c = getopt_long(argc, argv, "8f:b:d:irms:ohVO:D:qv",
+			  long_options, (int *)0)) != EOF) {
       switch (c) {
       case '8': cfg.bits = 8; break;
       case '1': cfg.bits = 16; break;
@@ -167,7 +191,10 @@ static int decode_switches(int argc, char **argv)
       case 'o': cfg.endless = false; break;
       case 'V': puts(ADPLAY_VERSION); exit(EXIT_SUCCESS);
       case 'h':	usage(); exit(EXIT_SUCCESS); break;
-      case 'D': cfg.database = optarg; break;
+      case 'D':
+	if(!mydb.load(optarg))
+	  message(MSG_WARN, "could not open database -- %s", optarg);
+	break;
       case 'O':
 	if(!strcmp(optarg,"oss")) cfg.output = oss; else
 	  if(!strcmp(optarg,"null")) cfg.output = null; else
@@ -176,10 +203,12 @@ static int decode_switches(int argc, char **argv)
 	      cfg.endless = false; // endless output is almost never desired here...
 	    } else
 	      if(!strcmp(optarg,"esound")) cfg.output = esound; else {
-		cout << program_name << ": unknown output method -- " << optarg << endl;
+		message(MSG_ERROR, "unknown output method -- %s", optarg);
 		exit(EXIT_FAILURE);
 	      }
 	break;
+      case 'q': if(cfg.message_level) cfg.message_level--; break;
+      case 'v': cfg.message_level++; break;
       }
   }
 
@@ -189,41 +218,43 @@ static int decode_switches(int argc, char **argv)
 static void play(const char *fn, Player *pl, unsigned int subsong)
 /* Start playback of subsong 'subsong' of file 'fn', using player 'player'. */
 {
+  unsigned long i;
+
   // initialize output & player
   pl->get_opl()->init();
   pl->p = CAdPlug::factory(fn,pl->get_opl());
 
   if(!pl->p) {
-    cout << program_name << ": unknown filetype -- " << fn << endl;
+    message(MSG_WARN, "unknown filetype -- %s", fn);
     return;
   }
 
   pl->p->rewind(subsong);
 
-  cout << "Playing '" << fn << "'..." << endl <<
-    "Type  : " << pl->p->gettype() << endl <<
-    "Title : " << pl->p->gettitle() << endl <<
-    "Author: " << pl->p->getauthor() << endl << endl;
+  fprintf(stderr, "Playing '%s'...\n"
+	  "Type  : %s\n"
+	  "Title : %s\n"
+	  "Author: %s\n\n", fn, pl->p->gettype().c_str(),
+	  pl->p->gettitle().c_str(), pl->p->getauthor().c_str());
 
   if(cfg.showinsts) {		// display instruments
-    cout << "Instrument names:" << endl;
-    for(unsigned long i=0;i<pl->p->getinstruments();i++)
-      cout << i << ": " << pl->p->getinstrument(i) << endl;
-    cout << endl;
+    fprintf(stderr, "Instrument names:\n");
+    for(i = 0;i < pl->p->getinstruments(); i++)
+      fprintf(stderr, "%2d: %s\n", i, pl->p->getinstrument(i).c_str());
+    fprintf(stderr, "\n");
   }
 
-  if(cfg.songmessage) {	// display song message
-    cout << "Song message:" << endl;
-    cout << pl->p->getdesc() << endl << endl;
-  }
+  if(cfg.songmessage)	// display song message
+    fprintf(stderr, "Song message:\n%s\n\n", pl->p->getdesc().c_str());
 
   // play loop
   do {
     if(cfg.songinfo)	// display song info
-      printf("Subsong: %d/%d, Order: %d/%d, Pattern: %d/%d, Row: %d, Speed: %d, Timer: %.2fHz     \r",
-	     subsong,pl->p->getsubsongs()-1,pl->p->getorder(),pl->p->getorders(),
-	     pl->p->getpattern(),pl->p->getpatterns(),pl->p->getrow(),
-	     pl->p->getspeed(),pl->p->getrefresh());
+      fprintf(stderr, "Subsong: %d/%d, Order: %d/%d, Pattern: %d/%d, Row: %d, "
+	      "Speed: %d, Timer: %.2fHz     \r",
+	      subsong, pl->p->getsubsongs()-1, pl->p->getorder(),
+	      pl->p->getorders(), pl->p->getpattern(), pl->p->getpatterns(),
+	      pl->p->getrow(), pl->p->getspeed(), pl->p->getrefresh());
 
     pl->frame();
   } while(pl->playing || cfg.endless);
@@ -233,7 +264,6 @@ static void shutdown(void)
 /* General deinitialization handler. */
 {
   if(player) delete player;
-  if(cfg.userdb) free(cfg.userdb);
 }
 
 static void sighandler(int signal)
@@ -246,13 +276,13 @@ static void sighandler(int signal)
   }
 }
 
-/***** main program *****/
+/***** Main program *****/
 
 int main(int argc, char **argv)
 {
-  CAdPlugDatabase	mydb;
   int			optind, i;
   const char		*homedir;
+  char			*userdb;
 
   // init
   program_name = argv[0];
@@ -262,17 +292,17 @@ int main(int argc, char **argv)
   // Try user's home directory first, before trying the default location.
   homedir = getenv("HOME");
   if(homedir) {
-    cfg.userdb = (char *)malloc(strlen(homedir) + strlen(ADPLUG_CONFDIR) +
-				strlen(ADPLUGDB_FILE) + 3);
-    strcpy(cfg.userdb, homedir); strcat(cfg.userdb, "/" ADPLUG_CONFDIR "/");
-    strcat(cfg.userdb, ADPLUGDB_FILE);
+    userdb = (char *)malloc(strlen(homedir) + strlen(ADPLUG_CONFDIR) +
+			    strlen(ADPLUGDB_FILE) + 3);
+    strcpy(userdb, homedir); strcat(userdb, "/" ADPLUG_CONFDIR "/");
+    strcat(userdb, ADPLUGDB_FILE);
   }
 
   // parse commandline
   optind = decode_switches(argc,argv);
   if(optind == argc) {	// no filename given
-    cout << program_name << ": need at least one file for playback" << endl;
-    cout << "Try '" << program_name << " --help' for more information." << endl;
+    fprintf(stderr, "%s: need at least one file for playback", program_name);
+    fprintf(stderr, "Try '%s --help' for more information.\n", program_name);
     exit(EXIT_FAILURE);
   }
   if(argc - optind > 1) cfg.endless = false;	// more than 1 file given
@@ -280,7 +310,7 @@ int main(int argc, char **argv)
   // init player
   switch(cfg.output) {
   case none:
-    cout << program_name <<": no output methods compiled in" << endl;
+    message(MSG_PANIC, "no output methods compiled in");
     exit(EXIT_FAILURE);
 #ifdef DRIVER_OSS
   case oss: player = new OSSPlayer(cfg.device, cfg.bits, cfg.channels, cfg.freq, cfg.buf_size); break;
@@ -295,13 +325,13 @@ int main(int argc, char **argv)
   case esound: player = new EsoundPlayer(cfg.bits, cfg.channels, cfg.freq, cfg.device); break;
 #endif
   default:
-    cout << program_name << ": output method not available" << endl;
+    message(MSG_ERROR, "output method not available");
     exit(EXIT_FAILURE);
   }
 
-  // init database
-  if(cfg.userdb) mydb.load(cfg.userdb);
-  mydb.load(cfg.database);
+  // load database
+  if(userdb) { mydb.load(userdb); free(userdb); }
+  mydb.load(ADPLUGDB_PATH);
   CAdPlug::set_database(&mydb);
 
   // play all files from commandline
