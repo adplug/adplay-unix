@@ -17,15 +17,15 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
  */
 
-#include "defines.h"
+#include <unistd.h>
+
 #include "sdl.h"
+#include "defines.h"
 
 SDLPlayer::SDLPlayer(unsigned char bits, int channels, int freq,
 		     unsigned long bufsize)
-  : EmuPlayer(bits, channels, freq, bufsize), DataReady(0)
+  : opl(freq, bits == 16, channels == 2)
 {
-   SDL_AudioSpec spec;
-
    memset(&spec, 0x00, sizeof(SDL_AudioSpec));
 
    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
@@ -45,7 +45,7 @@ SDLPlayer::SDLPlayer(unsigned char bits, int channels, int freq,
       exit(EXIT_FAILURE);
    }
 
-   SDL_PauseAudio(0);
+   message(MSG_DEBUG, "got audio buffer size -- %d", spec.size);
 }
 
 SDLPlayer::~SDLPlayer()
@@ -56,27 +56,28 @@ SDLPlayer::~SDLPlayer()
   SDL_Quit();
 }
 
-void SDLPlayer::callback(void *userdata, Uint8 *stream, int len)
+void SDLPlayer::frame()
 {
-   SDLPlayer *self = (SDLPlayer *)userdata;
-
-   if (self->DataReady == 1) {
-      if (self->playsize - self->played < (unsigned)len)
-        len = self->playsize - self->played;
-      memcpy(stream, self->playbuf, len);
-      self->played += len;
-      self->playbuf += len;
-      if (self->playsize <= self->played)
-         self->DataReady = 0;
-   }
+  SDL_PauseAudio(0);
+  SDL_Delay(1000 * spec.freq / (spec.size / getsampsize()));
 }
 
-void SDLPlayer::output(const void *buf, unsigned long size)
+void SDLPlayer::callback(void *userdata, Uint8 *audiobuf, int len)
 {
-   while(DataReady) ;
+  SDLPlayer	*self = (SDLPlayer *)userdata;
+  static long	minicnt = 0;
+  long		i, towrite = len / self->getsampsize();
+  char		*pos = (char *)audiobuf;
 
-   played = 0;
-   playbuf = (unsigned char *)buf;
-   playsize = size;
-   DataReady = 1;
+  // Prepare audiobuf with emulator output
+  while(towrite > 0) {
+    while(minicnt < 0) {
+      minicnt += self->spec.freq;
+      self->playing = self->p->update();
+    }
+    i = min(towrite, (long)(minicnt / self->p->getrefresh() + 4) & ~3);
+    self->opl.update((short *)pos, i);
+    pos += i * self->getsampsize(); towrite -= i;
+    minicnt -= (long)(self->p->getrefresh() * i);
+  }
 }

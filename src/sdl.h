@@ -20,27 +20,28 @@
 #ifndef H_SDL
 #define H_SDL
 
+#include <SDL.h>
+//#include <SDL_mutex.h>
+//#include <SDL_thread.h>
+
 #include "output.h"
 
-#include "SDL.h"
-#include "SDL_mutex.h"
-#include "SDL_thread.h"
-
-class SDLPlayer: public EmuPlayer
+class SDLPlayer: public Player
 {
+private:
+  CEmuopl	opl;
+  SDL_AudioSpec	spec;
+
+  static void callback(void *, Uint8 *, int);
+  unsigned char getsampsize()
+    { return spec.channels * (spec.format == AUDIO_U8 ? 1 : 2); }
+
 public:
   SDLPlayer(unsigned char bits, int channels, int freq, unsigned long bufsize);
   virtual ~SDLPlayer();
 
-protected:
-  virtual void output(const void *buf, unsigned long size);
-
-private:
-  volatile int	DataReady;
-  unsigned char	*playbuf;
-  unsigned long	playsize, played;
-
-  static void callback(void *userdata, Uint8 *stream, int len);
+  virtual void frame();
+  virtual Copl *get_opl() { return &opl; }
 };
 
 #endif

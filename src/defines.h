@@ -34,6 +34,10 @@
 #define MSG_NOTE	3
 #define MSG_DEBUG	4
 
+#ifndef min
+#  define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+
 /***** Global functions *****/
 
 void message(int level, const char *fmt, ...);

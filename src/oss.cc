@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001, 2002 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2003 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 
 OSSPlayer::OSSPlayer(const char *device, unsigned char bits, int channels,
 		     int freq, unsigned long bufsize)
-  : EmuPlayer(bits,channels,freq,bufsize)
+  : EmuPlayer(bits, channels, freq, bufsize)
 {
   int format = (bits == 16 ? AFMT_S16_LE : AFMT_S8);
 

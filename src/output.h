@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001, 2002 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2003 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@
 class Player
 {
 public:
-  CPlayer *p;
-  bool playing;
+  CPlayer	*p;
+  bool		playing;
 
   Player();
   virtual ~Player();
@@ -38,23 +38,26 @@ public:
 
 class EmuPlayer: public Player
 {
+private:
+  CEmuopl	opl;
+  char		*audiobuf;
+  unsigned long	buf_size, freq;
+  unsigned char	bits, channels;
+
 public:
-  EmuPlayer(unsigned char nbits, unsigned char nchannels, unsigned long nfreq, unsigned long nbufsize = 512);
+  EmuPlayer(unsigned char nbits, unsigned char nchannels, unsigned long nfreq,
+	    unsigned long nbufsize);
   virtual ~EmuPlayer();
 
   virtual void frame();
-  virtual Copl *get_opl();
+  virtual Copl *get_opl() { return &opl; }
 
 protected:
   virtual void output(const void *buf, unsigned long size) = 0;
+  // The output buffer is always of the size requested through the constructor.
+  // This time, size is measured in bytes, not samples!
 
-  unsigned char getsampsize();
-
-private:
-  CEmuopl opl; // OPL2 emulator
-  char *audiobuf;
-  unsigned long buf_size, freq;
-  unsigned char bits, channels;
+  unsigned char getsampsize() { return (channels * (bits / 8)); }
 };
 
 #endif

@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001, 2002 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2003 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,14 +26,15 @@ class OSSPlayer: public EmuPlayer
 {
 public:
   OSSPlayer(const char *device, unsigned char bits, int channels,
-	    int freq, unsigned long bufsize = 512);
+	    int freq, unsigned long bufsize);
   virtual ~OSSPlayer();
 
 protected:
   virtual void output(const void *buf, unsigned long size);
 
 private:
-  int audio_fd; // audio device file
+  int		audio_fd;	// audio device file
+  unsigned long	size;		// audio buffer size in bytes
 };
 
 #endif

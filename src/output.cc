@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001, 2002 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2003 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,7 @@
 #include <stdio.h>
 
 #include "output.h"
-
-/***** min *****/
-
-#ifndef min
-#define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif
+#include "defines.h"
 
 /***** Player *****/
 
@@ -43,7 +38,7 @@ Player::~Player()
 
 EmuPlayer::EmuPlayer(unsigned char nbits, unsigned char nchannels,
 		     unsigned long nfreq, unsigned long nbufsize)
-  : opl(nfreq,nbits == 16, nchannels == 2), buf_size(nbufsize), freq(nfreq),
+  : opl(nfreq, nbits == 16, nchannels == 2), buf_size(nbufsize), freq(nfreq),
     bits(nbits), channels(nchannels)
 {
   audiobuf = new char [buf_size * getsampsize()];
@@ -66,22 +61,12 @@ void EmuPlayer::frame()
       minicnt += freq;
       playing = p->update();
     }
-    i = min(towrite,(long)(minicnt/p->getrefresh()+4)&~3);
+    i = min(towrite, (long)(minicnt / p->getrefresh() + 4) & ~3);
     opl.update((short *)pos, i);
     pos += i * getsampsize(); towrite -= i;
     minicnt -= (long)(p->getrefresh() * i);
-    }
+  }
 
   // call output driver
   output(audiobuf, buf_size * getsampsize());
-}
-
-inline Copl *EmuPlayer::get_opl()
-{
-  return &opl;
-}
-
-inline unsigned char EmuPlayer::getsampsize()
-{
-  return (channels * (bits / 8));
 }

@@ -94,6 +94,12 @@ the disk writer is to be used!
 .B -d --device=URL
 Connect to "hostname:port" combination in URL. Example:
 "myhost.sound.net:1234". The default is "localhost:16001".
+.SS "SDL driver (sdl) specific:"
+.TP
+.B -b --buffer=SIZE
+Set sound buffer size to SIZE samples. If you notice sound skipping with the
+default setting, try a greater buffer size. Note that this is measured in
+samples, not bytes! This is 512 samples by default.
 .SS "Playback quality:"
 .TP
 .B -8, --8bit

@@ -96,7 +96,6 @@ if test ${enable_output_sdl:=yes} = yes; then
       AC_MSG_RESULT([*** SDL (libsdl) >= 1.2.0 not installed ***]))
 fi
 
-
 AC_SUBST([drivers])
 
 AC_OUTPUT

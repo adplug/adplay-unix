@@ -27,9 +27,11 @@
 #include "defines.h"
 #include "disk.h"
 
+#define BUFSIZE		512
+
 DiskWriter::DiskWriter(const char *filename, unsigned char nbits, unsigned char nchannels,
 		       unsigned long nfreq)
-  : EmuPlayer(nbits,nchannels,nfreq), f(0), samplesize(0)
+  : EmuPlayer(nbits, nchannels, nfreq, BUFSIZE), f(0), samplesize(0)
 {
   if(!filename) {
     message(MSG_ERROR, "no output filename specified");
