@@ -37,6 +37,7 @@ protected:
 private:
   binostream	*f;
   unsigned long samplesize;
+  unsigned char	bits;
 };
 
 #endif

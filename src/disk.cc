@@ -29,7 +29,7 @@
 
 DiskWriter::DiskWriter(const char *filename, unsigned char nbits, unsigned char nchannels,
 		       unsigned long nfreq)
-  : EmuPlayer(nbits,nchannels,nfreq), f(0), samplesize(0)
+  : EmuPlayer(nbits,nchannels,nfreq), f(0), samplesize(0), bits(nbits)
 {
   if(!filename) {
     message(MSG_ERROR, "no output filename specified");
@@ -40,7 +40,7 @@ DiskWriter::DiskWriter(const char *filename, unsigned char nbits, unsigned char 
   if(strcmp(filename, "-"))
     f = new binofstream(filename);
   else
-    f = new binowstream(&cout);
+    f = new binowstream(&cout);	// not very good practice to mix cout with stdout
 
   if(!f || f->error()) {
     message(MSG_ERROR, "cannot open file for output -- %s", filename);
@@ -78,6 +78,15 @@ DiskWriter::~DiskWriter()
 
 void DiskWriter::output(const void *buf, unsigned long size)
 {
-  f->writeString((char *)buf, size);
+  short		*sbuf = (short *)buf;
+  unsigned long	i;
+
+  // Write only little-endian on 16bit samples
+  if(bits == 2) {
+    for(i = 0; i < size / 2; i++)
+      f->writeInt(sbuf[i], 2);
+  } else
+    f->writeString((char *)buf, size);
+
   samplesize += size;
 }
