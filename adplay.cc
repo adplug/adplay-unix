@@ -245,14 +245,11 @@ int main(int argc, char **argv)
   }
   format = (bits == 16 ? AFMT_S16_LE : AFMT_S8);
   ioctl(audio_fd, SNDCTL_DSP_SETFMT, &format);
-#ifdef FREEBSD
   {
-    int	freebsd_stereo_ioctl_kludge = channels - 1;
-    ioctl(audio_fd, SNDCTL_DSP_STEREO, &freebsd_stereo_ioctl_kludge);
+    int stereo = channels - 1;
+    ioctl(audio_fd, SNDCTL_DSP_STEREO, &stereo);
   }
-#else // assume linux
   ioctl(audio_fd, SNDCTL_DSP_CHANNELS, &channels);
-#endif
   ioctl(audio_fd, SNDCTL_DSP_SPEED, &freq);
 
   // main loop
