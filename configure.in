@@ -16,7 +16,7 @@ AC_PROG_CXXCPP
 
 # Nothing works without these libraries...
 AC_CHECK_LIB(stdc++,main,,AC_MSG_ERROR([libstdc++ not installed]))
-AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([AdPlug >= 1.1 not installed]))
+AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([AdPlug not installed]))
 
 ##### Output mechanism checks #####
 # These checks enable or disable certain output mechanisms,
