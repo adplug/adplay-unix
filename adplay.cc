@@ -69,7 +69,7 @@ bool		endless=ENDLESS,showinsts=SHOWINSTS,songinfo=SONGINFO,songmessage=SONGMESS
 
 static void usage (int status)
 {
-  printf (_("%s - OPL2 audio player.\n"), program_name);
+  printf (_("%s - OPL2 audio player\n"), program_name);
   printf (_("Usage: %s [OPTION]... [FILE]...\n"), program_name);
   printf (_("\
 Options:
