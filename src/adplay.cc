@@ -68,7 +68,7 @@ static struct {
   EmuType		emutype;
   Outputs		output;
 } cfg = {
-  512, 44100, 1, 16, MSG_NOTE,
+  2048, 44100, 1, 16, MSG_NOTE,
   0,
   NULL,
   NULL,

@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001 - 2003 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2004 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,11 +27,11 @@ ALSAPlayer::ALSAPlayer(Copl *nopl, const char *device, unsigned char bits,
   : EmuPlayer(nopl, bits, channels, freq, bufsize)
 {
   snd_pcm_hw_params_t	*hwparams;
-  unsigned int		nfreq = freq, err;
+  unsigned int		nfreq = freq;
 
   if(!device) device = DEFAULT_DEVICE;
 
-  snd_pcm_hw_params_alloca(&hwparams);
+  snd_pcm_hw_params_malloc(&hwparams);
 
   // Try to open audio device
   if(snd_pcm_open(&pcm_handle, device, SND_PCM_STREAM_PLAYBACK, 0) < 0) {
@@ -83,7 +83,7 @@ ALSAPlayer::ALSAPlayer(Copl *nopl, const char *device, unsigned char bits,
 
   // Set buffer size (in samples)
   if(snd_pcm_hw_params_set_buffer_size(pcm_handle, hwparams, bufsize / getsampsize()) < 0) {
-    fprintf(stderr, "Error setting buffersize.\n");
+    message(MSG_ERROR, "error setting buffersize");
     exit(EXIT_FAILURE);
   }
 
@@ -94,12 +94,6 @@ ALSAPlayer::ALSAPlayer(Copl *nopl, const char *device, unsigned char bits,
   }
 
   snd_pcm_hw_params_free(hwparams);
-
-  /*  if((err = snd_pcm_prepare(pcm_handle)) < 0) {
-    message(MSG_ERROR, "cannot prepare audio interface for use -- %s",
-	    snd_strerror(err));
-    exit(EXIT_FAILURE);
-    } */
 }
 
 ALSAPlayer::~ALSAPlayer()

@@ -60,6 +60,9 @@ Uses the QNX system's standard output method.
 Uses the SDL library for sound output. The library has a broader
 platform support than any of the other output methods. Thus, it could
 be useful on some exotic systems.
+.SS alsa -- Advanced Linux Sound Architecture (ALSA) driver
+.PP
+Uses the standard output method on newer Linux systems.
 .SH OPTIONS
 .PP
 The order of the option commandline parameters is not important,
@@ -77,7 +80,7 @@ mechanisms.
 .B -b --buffer=SIZE
 Set sound buffer size to SIZE samples. If you notice sound skipping with the
 default setting, try a greater buffer size. Note that this is measured in
-samples, not bytes! This is 512 samples by default.
+samples, not bytes! This is 2048 samples by default.
 .TP
 .B -d --device=FILE
 Set sound output device file to FILE. This is \fB/dev/dsp\fP by
@@ -99,7 +102,16 @@ Connect to "hostname:port" combination in URL. Example:
 .B -b --buffer=SIZE
 Set sound buffer size to SIZE samples. If you notice sound skipping with the
 default setting, try a greater buffer size. Note that this is measured in
-samples, not bytes! This is 512 samples by default.
+samples, not bytes! This is 2048 samples by default.
+.SS "ALSA driver (alsa) specific:"
+.TP
+.B -b --buffer=SIZE
+Set sound buffer size to SIZE samples. If you notice sound skipping with the
+default setting, try a greater buffer size. Note that this is measured in
+samples, not bytes! This is 2048 samples by default.
+.TP
+.B -d --device=DEVICE
+Set sound output device to DEVICE. This is \fBplughw:0,0\fP by default.
 .SS "Playback quality:"
 .TP
 .B -8, --8bit
