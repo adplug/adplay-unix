@@ -1,5 +1,5 @@
 %define name adplay
-%define version 1.2
+%define version 1.3
 %define release 1
 
 Summary: AdLib music player for the command line
@@ -8,11 +8,12 @@ Version: %{version}
 Release: %{release}
 Source0: %{name}-%{version}.tar.bz2
 License: GPL
-Group: Sound
+Group: Applications/Multimedia
 URL: http://adplug.sourceforge.net
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
-BuildRequires: adplug-devel >= 1.1
+BuildRequires: adplug-devel >= 1.4
+Requires: adplug >= 1.4
 
 %description
 AdPlay/UNIX is AdPlug's UNIX console-based frontend. AdPlug is a free,
@@ -42,6 +43,11 @@ rm -rf $RPM_BUILD_ROOT
 %_mandir/man1/adplay.1*
 
 %changelog
+* Tue Mar  4 2003 Götz Waschk <waschk@linux-mandrake.com> 1.3-1
+- requires new adplug libraries
+- fix group for RH standard
+- new version
+
 * Tue Nov 26 2002 Götz Waschk <waschk@linux-mandrake.com> 1.2-1
 - initial package
 
