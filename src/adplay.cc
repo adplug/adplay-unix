@@ -99,6 +99,8 @@ static void usage()
 	 "  -d, --device=FILE          output to FILE ('-' is stdout)\n\n"
 	 "EsounD driver (esound) specific:\n"
 	 "  -d, --device=URL           URL to EsounD server host (hostname:port)\n\n"
+	 "SDL driver (sdl) specific:\n"
+	 "  -b, --buffer=SIZE          set output buffer size to SIZE\n\n"
 	 "Playback quality:\n"
 	 "  -8, --8bit                 8-bit sample quality\n"
 	 "      --16bit                16-bit sample quality\n"
@@ -314,22 +316,35 @@ int main(int argc, char **argv)
     message(MSG_PANIC, "no output methods compiled in");
     exit(EXIT_FAILURE);
 #ifdef DRIVER_OSS
-  case oss: player = new OSSPlayer(cfg.device, cfg.bits, cfg.channels, cfg.freq, cfg.buf_size); break;
+  case oss:
+    player = new OSSPlayer(cfg.device, cfg.bits, cfg.channels, cfg.freq,
+			   cfg.buf_size);
+    break;
 #endif
 #ifdef DRIVER_NULL
-  case null: player = new NullOutput(); break;
+  case null:
+    player = new NullOutput();
+    break;
 #endif
 #ifdef DRIVER_DISK
-  case disk: player = new DiskWriter(cfg.device, cfg.bits, cfg.channels, cfg.freq); break;
+  case disk:
+    player = new DiskWriter(cfg.device, cfg.bits, cfg.channels, cfg.freq);
+    break;
 #endif
 #ifdef DRIVER_ESOUND
-  case esound: player = new EsoundPlayer(cfg.bits, cfg.channels, cfg.freq, cfg.device); break;
+  case esound:
+    player = new EsoundPlayer(cfg.bits, cfg.channels, cfg.freq, cfg.device);
+    break;
 #endif
 #ifdef DRIVER_QSA
-  case qsa: player = new QSAPlayer(cfg.bits, cfg.channels, cfg.freq); break;
+  case qsa:
+    player = new QSAPlayer(cfg.bits, cfg.channels, cfg.freq);
+    break;
 #endif
 #ifdef DRIVER_SDL
-  case sdl: player = new SDLPlayer(cfg.bits, cfg.channels, cfg.freq); break;
+  case sdl:
+    player = new SDLPlayer(cfg.bits, cfg.channels, cfg.freq, cfg.buf_size);
+    break;
 #endif
   default:
     message(MSG_ERROR, "output method not available");

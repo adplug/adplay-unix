@@ -26,23 +26,19 @@
 #include "SDL_mutex.h"
 #include "SDL_thread.h"
 
-#define SDL_BUFFER_SIZE 8192
-
 class SDLPlayer: public EmuPlayer
 {
 public:
-  SDLPlayer(unsigned char bits, int channels, int freq);
+  SDLPlayer(unsigned char bits, int channels, int freq, unsigned long bufsize);
   virtual ~SDLPlayer();
 
 protected:
   virtual void output(const void *buf, unsigned long size);
 
 private:
-  SDL_semaphore* datastream;
-  int DataReady;
-  unsigned char* playbuf;
-  unsigned long  playsize;
-  unsigned long  played;
+  volatile int	DataReady;
+  unsigned char	*playbuf;
+  unsigned long	playsize, played;
 
   static void callback(void *userdata, Uint8 *stream, int len);
 };

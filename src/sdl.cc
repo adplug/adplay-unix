@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001, 2002 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2003 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,38 +20,27 @@
 #include "defines.h"
 #include "sdl.h"
 
-SDLPlayer::SDLPlayer(unsigned char bits, int channels, int freq)
-  : EmuPlayer(bits, channels, freq, SDL_BUFFER_SIZE)
+SDLPlayer::SDLPlayer(unsigned char bits, int channels, int freq,
+		     unsigned long bufsize)
+  : EmuPlayer(bits, channels, freq, bufsize), DataReady(0)
 {
    SDL_AudioSpec spec;
-   
+
    memset(&spec, 0x00, sizeof(SDL_AudioSpec));
 
-   if (SDL_Init(SDL_INIT_AUDIO) < 0)
-   {
+   if (SDL_Init(SDL_INIT_AUDIO) < 0) {
       message(MSG_ERROR, "unable to initialize SDL -- %s", SDL_GetError());
       exit(EXIT_FAILURE);
    }
 
-   datastream = SDL_CreateSemaphore(1);
-   DataReady = 0;
-
    spec.freq = freq;
-   if (bits==16)
-   {
-      spec.format = AUDIO_S16SYS;
-   }
-   else
-   {
-      spec.format = AUDIO_U8;
-   }
+   if (bits == 16) spec.format = AUDIO_S16SYS; else spec.format = AUDIO_U8;
    spec.channels = channels;
-   spec.samples = SDL_BUFFER_SIZE;
+   spec.samples = bufsize;
    spec.callback = SDLPlayer::callback;
    spec.userdata = this;
 
-   if (SDL_OpenAudio(&spec, NULL) < 0)
-   {
+   if (SDL_OpenAudio(&spec, NULL) < 0) {
       message(MSG_ERROR, "unable to open audio -- %s", SDL_GetError());
       exit(EXIT_FAILURE);
    }
@@ -63,10 +52,7 @@ SDLPlayer::~SDLPlayer()
 {
   if (!SDL_WasInit(SDL_INIT_AUDIO)) return;
 
-  message(MSG_DEBUG, "deinit!");
-
   SDL_CloseAudio();
-  SDL_DestroySemaphore(datastream);
   SDL_Quit();
 }
 
@@ -74,25 +60,23 @@ void SDLPlayer::callback(void *userdata, Uint8 *stream, int len)
 {
    SDLPlayer *self = (SDLPlayer *)userdata;
 
-   if (self->DataReady==1)
-   {
+   if (self->DataReady == 1) {
+      if (self->playsize - self->played < (unsigned)len)
+        len = self->playsize - self->played;
       memcpy(stream, self->playbuf, len);
       self->played += len;
       self->playbuf += len;
       if (self->playsize <= self->played)
-      {
          self->DataReady = 0;
-         SDL_SemPost(self->datastream);
-      }
    }
 }
 
 void SDLPlayer::output(const void *buf, unsigned long size)
 {
-   SDL_SemWait(datastream);
+   while(DataReady) ;
 
    played = 0;
-   playbuf = (unsigned char*)buf;
+   playbuf = (unsigned char *)buf;
    playsize = size;
    DataReady = 1;
 }
