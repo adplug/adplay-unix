@@ -89,43 +89,35 @@ void message(int level, const char *fmt, ...)
 static void usage()
 /* Print usage information. */
 {
-  printf("Usage: %s [OPTION]... FILE...\n\
-\n\
-Output selection:\n\
-  -O, --output=OUTPUT        Specify output mechanism.\n\
-\n\
-OSS driver (oss) specific:\n\
-  -d, --device=FILE          set sound device file to FILE\n\
-  -b, --buffer=SIZE          set output buffer size to SIZE\n\
-\n\
-Disk writer (disk) specific:\n\
-  -d, --device=FILE          output to FILE ('-' is stdout)\n\
-\n\
-EsounD driver (esound) specific:\n\
-  -d, --device=URL           URL to EsounD server host (hostname:port)\n\
-\n\
-Playback quality:\n\
-  -8, --8bit                 8-bit sample quality\n\
-      --16bit                16-bit sample quality\n\
-  -f, --freq=FREQ            set sample frequency to FREQ\n\
-      --stereo               stereo stream\n\
-      --mono                 mono stream\n\
-\n\
-Informative output:\n\
-  -i, --instruments          display instrument names\n\
-  -r, --realtime             display realtime song info\n\
-  -m, --message              display song message\n\
-\n\
-Playback:
-  -s, --subsong=N            play subsong number N\n\
-  -o, --once                 play only once, don't loop\n\
-\n\
-Generic:\n\
-  -D, --database=FILE        additionally use database file FILE\n\
-  -q, --quiet                be more quiet\n\
-  -v, --verbose              be more verbose\n\
-  -h, --help                 display this help and exit\n\
-  -V, --version              output version information and exit\n\n",
+  printf("Usage: %s [OPTION]... FILE...\n\n"
+	 "Output selection:\n"
+	 "  -O, --output=OUTPUT        Specify output mechanism.\n\n"
+	 "OSS driver (oss) specific:\n"
+	 "  -d, --device=FILE          set sound device file to FILE\n"
+	 "  -b, --buffer=SIZE          set output buffer size to SIZE\n\n"
+	 "Disk writer (disk) specific:\n"
+	 "  -d, --device=FILE          output to FILE ('-' is stdout)\n\n"
+	 "EsounD driver (esound) specific:\n"
+	 "  -d, --device=URL           URL to EsounD server host (hostname:port)\n\n"
+	 "Playback quality:\n"
+	 "  -8, --8bit                 8-bit sample quality\n"
+	 "      --16bit                16-bit sample quality\n"
+	 "  -f, --freq=FREQ            set sample frequency to FREQ\n"
+	 "      --stereo               stereo stream\n"
+	 "      --mono                 mono stream\n\n"
+	 "Informative output:\n"
+	 "  -i, --instruments          display instrument names\n"
+	 "  -r, --realtime             display realtime song info\n"
+	 "  -m, --message              display song message\n\n"
+	 "Playback:\n"
+	 "  -s, --subsong=N            play subsong number N\n"
+	 "  -o, --once                 play only once, don't loop\n\n"
+	 "Generic:\n"
+	 "  -D, --database=FILE        additionally use database file FILE\n"
+	 "  -q, --quiet                be more quiet\n"
+	 "  -v, --verbose              be more verbose\n"
+	 "  -h, --help                 display this help and exit\n"
+	 "  -V, --version              output version information and exit\n\n",
 	 program_name);
 
   // Print list of available output mechanisms
@@ -240,7 +232,7 @@ static void play(const char *fn, Player *pl, unsigned int subsong)
   if(cfg.showinsts) {		// display instruments
     fprintf(stderr, "Instrument names:\n");
     for(i = 0;i < pl->p->getinstruments(); i++)
-      fprintf(stderr, "%2d: %s\n", i, pl->p->getinstrument(i).c_str());
+      fprintf(stderr, "%2lu: %s\n", i, pl->p->getinstrument(i).c_str());
     fprintf(stderr, "\n");
   }
 
@@ -303,6 +295,7 @@ int main(int argc, char **argv)
   if(optind == argc) {	// no filename given
     fprintf(stderr, "%s: need at least one file for playback\n", program_name);
     fprintf(stderr, "Try '%s --help' for more information.\n", program_name);
+    if(userdb) free(userdb);
     exit(EXIT_FAILURE);
   }
   if(argc - optind > 1) cfg.endless = false;	// more than 1 file given

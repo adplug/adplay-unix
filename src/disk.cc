@@ -40,7 +40,7 @@ DiskWriter::DiskWriter(const char *filename, unsigned char nbits, unsigned char 
   if(strcmp(filename, "-"))
     f = new binofstream(filename);
   else
-    f = new binowstream(&cout);	// not very good practice to mix cout with stdout
+    f = new binowstream(&std::cout);	// not very good to mix cout with stdout
 
   if(!f || f->error()) {
     message(MSG_ERROR, "cannot open file for output -- %s", filename);
