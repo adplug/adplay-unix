@@ -30,6 +30,8 @@
 #include "output.h"
 #include "players.h"
 
+#define DEFAULT_DATABASE	"/usr/local/share/adplug/adplug.db"
+
 /***** global variables *****/
 const char *program_name;
 static Player *player = 0;		// global player object
@@ -38,18 +40,24 @@ static Player *player = 0;		// global player object
 static struct {
   int buf_size, freq, channels, bits;
   unsigned int subsong;
-  char *device;
+  const char *device, *database;
   bool endless, showinsts, songinfo, songmessage;
   Outputs output;
-} cfg = { 512, 44100, 1, 16, 0, 0, true, false, false, false, DEFAULT_DRIVER };
+} cfg = {
+  512, 44100, 1, 16,
+  0,
+  0, DEFAULT_DATABASE,
+  true, false, false, false,
+  DEFAULT_DRIVER
+};
 
 /***** local functions *****/
 
-static void usage(int exit_status)
+static void usage()
 /* Print usage information and exit with exit_status. */
 {
-  cout << "Usage: " << program_name << " [OPTION]... FILE..." << endl;
-  cout << "\
+  cout << "Usage: " << program_name << " [OPTION]... FILE...\n\
+\n\
 Output selection:\n\
   -O, --output=OUTPUT        Specify output mechanism.\n\
 \n\
@@ -80,6 +88,7 @@ Playback:
   -o, --once                 play only once, don't loop\n\
 \n\
 Generic:\n\
+  -D, --database=FILE        Use database file FILE\n\
   -h, --help                 display this help and exit\n\
   -V, --version              output version information and exit" << endl << endl;
 
@@ -98,8 +107,6 @@ Generic:\n\
   cout << "esound ";
 #endif
   cout << endl;
-
-  exit(exit_status);
 }
 
 static int decode_switches(int argc, char **argv)
@@ -122,13 +129,14 @@ static int decode_switches(int argc, char **argv)
     {"message",no_argument,NULL,'m'},		// song message
     {"subsong",no_argument,NULL,'s'},		// play subsong
     {"once",no_argument,NULL,'o'},		// don't loop
-    {"help", no_argument, 0, 'h'},		// display help
-    {"version", no_argument, 0, 'V'},		// version information
+    {"help",no_argument,NULL,'h'},		// display help
+    {"version",no_argument,NULL,'V'},		// version information
     {"output",required_argument,NULL,'O'},	// output mechanism
+    {"database",required_argument,NULL,'D'},	// different database
     {NULL, 0, NULL, 0}				// end of options
   };
 
-  while ((c = getopt_long(argc, argv, "8f:b:d:irms:ohVO:", long_options, (int *) 0)) != EOF) {
+  while ((c = getopt_long(argc, argv, "8f:b:d:irms:ohVO:D:", long_options, (int *) 0)) != EOF) {
       switch (c) {
       case '8': cfg.bits = 8; break;
       case '1': cfg.bits = 16; break;
@@ -143,7 +151,8 @@ static int decode_switches(int argc, char **argv)
       case 's': cfg.subsong = atoi(optarg); break;
       case 'o': cfg.endless = false; break;
       case 'V': puts(ADPLAY_VERSION); exit(EXIT_SUCCESS);
-      case 'h':	usage(0); break;
+      case 'h':	usage(); exit(EXIT_SUCCESS); break;
+      case 'D': cfg.database = optarg; break;
       case 'O':
 	if(!strcmp(optarg,"oss")) cfg.output = oss; else
 	  if(!strcmp(optarg,"null")) cfg.output = null; else
@@ -225,7 +234,8 @@ static void sighandler(int signal)
 
 int main(int argc, char **argv)
 {
-  int optind,i;
+  CAdPlugDatabase	mydb;
+  int			optind, i;
 
   // init
   program_name = argv[0];
@@ -235,15 +245,16 @@ int main(int argc, char **argv)
   // parse commandline
   optind = decode_switches(argc,argv);
   if(optind == argc) {	// no filename given
-    cout << program_name << ": need at least one file for playback!" << endl;
-    usage(1);
+    cout << program_name << ": need at least one file for playback" << endl;
+    cout << "Try '" << program_name << " --help' for more information." << endl;
+    exit(EXIT_FAILURE);
   }
   if(argc - optind > 1) cfg.endless = false;	// more than 1 file given
 
   // init player
   switch(cfg.output) {
   case none:
-    cout << program_name <<": you got NO output mechanisms compiled in! You must be crazy..." << endl;
+    cout << program_name <<": no output methods compiled in" << endl;
     exit(EXIT_FAILURE);
 #ifdef DRIVER_OSS
   case oss: player = new OSSPlayer(cfg.device, cfg.bits, cfg.channels, cfg.freq, cfg.buf_size); break;
@@ -258,9 +269,14 @@ int main(int argc, char **argv)
   case esound: player = new EsoundPlayer(cfg.bits, cfg.channels, cfg.freq, cfg.device); break;
 #endif
   default:
-    cout << program_name << ": output method not available!" << endl;
+    cout << program_name << ": output method not available" << endl;
     exit(EXIT_FAILURE);
   }
+
+  // init database
+  if(!mydb.load(cfg.database))
+    cout << program_name << ": could not load database -- " << cfg.database << endl;
+  CAdPlug::set_database(&mydb);
 
   // play all files from commandline
   for(i=optind;i<argc;i++)

@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001, 2002 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2003 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,19 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
  */
 
+#include <iostream>
+#include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <binwrap.h>
 
 #include "defines.h"
 #include "disk.h"
 
 DiskWriter::DiskWriter(const char *filename, unsigned char nbits, unsigned char nchannels,
 		       unsigned long nfreq)
-  : EmuPlayer(nbits,nchannels,nfreq), samplesize(0)
+  : EmuPlayer(nbits,nchannels,nfreq), f(0), samplesize(0)
 {
   const struct {
     unsigned long chunkid, chunksize, format, subchunk1id, subchunk1size;
@@ -41,40 +44,62 @@ DiskWriter::DiskWriter(const char *filename, unsigned char nbits, unsigned char 
 		    0x61746164l, 0l };
 
   if(!filename) {
-    printf("%s: No output filename specified!\n", program_name);
+    fprintf(stderr, "%s: No output filename specified!\n", program_name);
     exit(EXIT_FAILURE);
   }
 
   // If filename is '-', output to stdout
   if(strcmp(filename, "-")) {
-    if(!(f = fopen(filename,"wb"))) {
-      perror(filename);
+    out.open(filename, ios::out | ios::bin);
+    if(!out.is_open()) {
+      fprintf(stderr, "%s: Cannot open file for output -- %s\n", program_name,
+	      filename);
       exit(EXIT_FAILURE);
     }
-  } else
-    f = stdout;
+    f = new binowstream(&out);
+  } else {
+    f = new binowstream(&cout);
+  }
+
+  f->setFlag(binio::BigEndian, false);
 
   // Write Microsoft RIFF WAVE header
-  fwrite(&riff_header,sizeof(riff_header),1,f);
+  f->writeInt(riff_header.chunkid, 4);
+  f->writeInt(riff_header.chunksize, 4);
+  f->writeInt(riff_header.format, 4);
+  f->writeInt(riff_header.subchunk1id, 4);
+  f->writeInt(riff_header.subchunk1size, 4);
+  f->writeInt(riff_header.audioformat, 2);
+  f->writeInt(riff_header.numchannels, 2);
+  f->writeInt(riff_header.samplerate, 4);
+  f->writeInt(riff_header.byterate, 4);
+  f->writeInt(riff_header.blockalign, 2);
+  f->writeInt(riff_header.bitspersample, 2);
+  f->writeInt(riff_header.subchunk2id, 4);
+  f->writeInt(riff_header.subchunk2size, 4);
 }
 
 DiskWriter::~DiskWriter()
 {
+  if(!f) return;
+
   if(samplesize % 2) { // Wave data must end on an even byte boundary
-    fputc(0, f);
+    f->writeInt(0, 1);
     samplesize++;
   }
 
   // Write file sizes
-  fseek(f, 40, SEEK_SET); fwrite(&samplesize, 4, 1, f);
+  f->seek(40); f->writeInt(samplesize, 4);
   samplesize += 36; // make absolute filesize (add header size)
-  fseek(f, 4, SEEK_SET); fwrite(&samplesize, 4, 1, f);
+  f->seek(4); f->writeInt(samplesize, 4);
 
-  fclose(f); // end disk writing
+  // end disk writing
+  delete f;
+  out.close();
 }
 
 void DiskWriter::output(const void *buf, unsigned long size)
 {
-  fwrite(buf,size,1,f);
+  f->writeString((char *)buf, size);
   samplesize += size;
 }
