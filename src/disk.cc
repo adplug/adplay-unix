@@ -29,7 +29,7 @@
 
 DiskWriter::DiskWriter(const char *filename, unsigned char nbits, unsigned char nchannels,
 		       unsigned long nfreq)
-  : EmuPlayer(nbits,nchannels,nfreq), f(0), samplesize(0), bits(nbits)
+  : EmuPlayer(nbits,nchannels,nfreq), f(0), samplesize(0)
 {
   if(!filename) {
     message(MSG_ERROR, "no output filename specified");
@@ -78,6 +78,15 @@ DiskWriter::~DiskWriter()
 
 void DiskWriter::output(const void *buf, unsigned long size)
 {
-  f->writeString((char *)buf, size);
+  char		*b = (char *)buf;
+  unsigned long	i, ssize = getsampsize();
+
+  for(i = 0; i < size; i += ssize)
+    switch(ssize) {
+    case 1: f->writeInt(*(b + i), 1); break;
+    case 2: f->writeInt(*(short *)(b + i), 2); break;
+    case 4: f->writeInt(*(long *)(b + i), 4); break;
+    }
+
   samplesize += size;
 }

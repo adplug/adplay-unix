@@ -17,26 +17,26 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
  */
 
-#ifndef H_DISK
-#define H_DISK
-
-#include <binio.h>
+#ifndef H_QSA
+#define H_QSA
 
 #include "output.h"
 
-class DiskWriter: public EmuPlayer
+#include <sys/asoundlib.h>
+
+#define QSA_FRAG_SIZE 4096
+
+class QSAPlayer: public EmuPlayer
 {
 public:
-  DiskWriter(const char *filename, unsigned char nbits, unsigned char nchannels,
-	     unsigned long nfreq);
-  virtual ~DiskWriter();
+  QSAPlayer(unsigned char bits, int channels, int freq);
+  virtual ~QSAPlayer();
 
 protected:
   virtual void output(const void *buf, unsigned long size);
 
 private:
-  binostream	*f;
-  unsigned long samplesize;
+  snd_pcm_t* audio_handle; // audio device handle
 };
 
 #endif

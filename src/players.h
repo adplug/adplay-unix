@@ -28,7 +28,7 @@
 #include "config.h"
 
 // Enumerate ALL outputs (regardless of availability)
-enum Outputs {none, null, oss, disk, esound};
+enum Outputs {none, null, oss, disk, esound, qsa, sdl};
 
 #define DEFAULT_DRIVER none
 
@@ -58,6 +58,20 @@ enum Outputs {none, null, oss, disk, esound};
 #include "esound.h"
 #undef DEFAULT_DRIVER
 #define DEFAULT_DRIVER esound
+#endif
+
+// QSA driver
+#ifdef DRIVER_QSA
+#include "qsa.h"
+#undef DEFAULT_DRIVER
+#define DEFAULT_DRIVER qsa
+#endif
+
+// SDL driver
+#ifdef DRIVER_SDL
+#include "sdl.h"
+#undef DEFAULT_DRIVER
+#define DEFAULT_DRIVER sdl
 #endif
 
 #endif

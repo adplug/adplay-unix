@@ -1,0 +1,90 @@
+<QPG:Generation>
+   <QPG:Options>
+      <QPG:User unattended="yes" verbosity="0" listfiles="yes"/>
+      <QPG:Defaults type="qnx_package"/>
+      <QPG:Source></QPG:Source>
+      <QPG:Release date="today" number="+"/>
+      <QPG:Build></QPG:Build>
+      <QPG:FileSorting strip="yes"/>
+      <QPG:Package targets="standart"/>
+      <QPG:Repository generate="yes"/>
+      <QPG:FinalDir></QPG:FinalDir>
+      <QPG:Cleanup></QPG:Cleanup>
+   </QPG:Options>
+
+   <QPG:Responsible>
+      <QPG:Company>QNX.ORG.RU Community</QPG:Company>
+      <QPG:Department></QPG:Department>
+      <QPG:Group></QPG:Group>
+      <QPG:Team>QNX.ORG.RU Team</QPG:Team>
+      <QPG:Employee>Mike Gorchak</QPG:Employee>
+      <QPG:EmailAddress>mike@malva.ua</QPG:EmailAddress>
+   </QPG:Responsible>
+
+   <QPG:Values>
+      <QPG:Files>
+         <QPG:Add file="./COPYING" install="LicenseUrl/" handling="repdata"/>
+         <QPG:Add permissions="0755" file="./src/adplay" install="/opt/bin/"/>
+         <QPG:Add permissions="0644" file="./AUTHORS" install="/usr/doc/adplay/"/>
+         <QPG:Add permissions="0644" file="./COPYING" install="/usr/doc/adplay/"/>
+         <QPG:Add permissions="0644" file="./ChangeLog" install="/usr/doc/adplay/"/>
+         <QPG:Add permissions="0644" file="./NEWS" install="/usr/doc/adplay/"/>
+         <QPG:Add permissions="0644" file="./README" install="/usr/doc/adplay/"/>
+         <QPG:Add permissions="0644" file="./TODO" install="/usr/doc/adplay/"/>
+         <QPG:Add permissions="0644" file="./doc/adplay.1" install="/opt/man/man1/"/>
+      </QPG:Files>
+      <QPG:PackageFilter>
+         <QPM:PackageManifest>
+            <QPM:PackageDescription>
+               <QPM:PackageType>Application</QPM:PackageType>
+               <QPM:PackageName>adplay</QPM:PackageName>
+               <QPM:PackageReleaseNumber>1</QPM:PackageReleaseNumber>
+               <QPM:PackageRepository>http://qnx.org.ru/repository</QPM:PackageRepository>
+               <QPM:FileVersion>1.01</QPM:FileVersion>
+            </QPM:PackageDescription>
+            <QPM:ProductDescription>
+               <QPM:ProductName>adplay</QPM:ProductName>
+               <QPM:ProductIdentifier>adplay</QPM:ProductIdentifier>
+               <QPM:ProductEmail>dn.tlp@gmx.net</QPM:ProductEmail>
+               <QPM:VendorName>Public</QPM:VendorName>
+               <QPM:VendorInstallName>public</QPM:VendorInstallName>
+               <QPM:VendorURL>http://adplug.sourceforge.net</QPM:VendorURL>
+               <QPM:VendorEmbedURL/>
+               <QPM:VendorEmail>dn.tlp@gmx.net</QPM:VendorEmail>
+               <QPM:AuthorName>Simon Peter</QPM:AuthorName>
+               <QPM:AuthorURL>http://adplug.sourceforge.net</QPM:AuthorURL>
+               <QPM:AuthorEmbedURL/>
+               <QPM:AuthorEmail>dn.tlp@gmx.net</QPM:AuthorEmail>
+               <QPM:ProductIconSmall/>
+               <QPM:ProductIconLarge/>
+               <QPM:ProductDescriptionShort>AdPlay/UNIX is AdPlug's UNIX console-based frontend. AdPlug is a free, universal OPL2 audio playback library. AdPlay/UNIX supports the full range of AdPlug's file format playback features.</QPM:ProductDescriptionShort>
+               <QPM:ProductDescriptionLong>AdPlay/UNIX is AdPlug's UNIX console-based frontend. AdPlug is a free, universal OPL2 audio playback library. AdPlay/UNIX supports the full range of AdPlug's file format playback features. Despite this, at the moment, only emulated OPL2 output is supported by AdPlay/UNIX, but this on a wide range of output devices.</QPM:ProductDescriptionLong>
+               <QPM:ProductDescriptionURL>http://adplug.sourceforge.net</QPM:ProductDescriptionURL>
+               <QPM:ProductDescriptionEmbedURL/>
+            </QPM:ProductDescription>
+            <QPM:ReleaseDescription>
+               <QPM:ReleaseVersion>1.4</QPM:ReleaseVersion>
+               <QPM:ReleaseUrgency>Medium</QPM:ReleaseUrgency>
+               <QPM:ReleaseStability>Stable</QPM:ReleaseStability>
+               <QPM:ReleaseNoteMinor/>
+               <QPM:ReleaseNoteMajor/>
+               <QPM:ReleaseBuild>1</QPM:ReleaseBuild>
+               <QPM:CountryExclude/>
+               <QPM:ReleaseCopyright>GNU General Public License</QPM:ReleaseCopyright>
+            </QPM:ReleaseDescription>
+            <QPM:ContentDescription>
+               <QPM:ContentTopic>Multimedia/Music and Audio/Audio Media Players</QPM:ContentTopic>
+               <QPM:ContentKeyword>FM, Tracker, Music, Adlib, OPL2, Player</QPM:ContentKeyword>
+               <QPM:Processor/>
+               <QPM:TargetProcessor/>
+               <QPM:DisplayEnvironment>Console</QPM:DisplayEnvironment>
+               <QPM:TargetAudience>User</QPM:TargetAudience>
+            </QPM:ContentDescription>
+            <QPM:LicenseUrl>repdata://LicenseUrl/COPYING</QPM:LicenseUrl>
+            <QPM:ProductInstallationDependencies>
+               <QPM:ProductRequirements/>
+            </QPM:ProductInstallationDependencies>
+         </QPM:PackageManifest>
+      </QPG:PackageFilter>
+   </QPG:Values>
+</QPG:Generation>

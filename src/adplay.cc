@@ -134,6 +134,12 @@ static void usage()
 #ifdef DRIVER_ESOUND
 	 "esound "
 #endif
+#ifdef DRIVER_QSA
+	 "qsa "
+#endif
+#ifdef DRIVER_SDL
+	 "sdl "
+#endif
 	 "\n");
 }
 
@@ -194,7 +200,9 @@ static int decode_switches(int argc, char **argv)
 	      cfg.output = disk;
 	      cfg.endless = false; // endless output is almost never desired here...
 	    } else
-	      if(!strcmp(optarg,"esound")) cfg.output = esound; else {
+	      if(!strcmp(optarg,"esound")) cfg.output = esound; else
+                if (!strcmp(optarg,"qsa")) cfg.output = qsa; else
+                   if (!strcmp(optarg,"sdl")) cfg.output = sdl; else {
 		message(MSG_ERROR, "unknown output method -- %s", optarg);
 		exit(EXIT_FAILURE);
 	      }
@@ -316,6 +324,12 @@ int main(int argc, char **argv)
 #endif
 #ifdef DRIVER_ESOUND
   case esound: player = new EsoundPlayer(cfg.bits, cfg.channels, cfg.freq, cfg.device); break;
+#endif
+#ifdef DRIVER_QSA
+  case qsa: player = new QSAPlayer(cfg.bits, cfg.channels, cfg.freq); break;
+#endif
+#ifdef DRIVER_SDL
+  case sdl: player = new SDLPlayer(cfg.bits, cfg.channels, cfg.freq); break;
 #endif
   default:
     message(MSG_ERROR, "output method not available");

@@ -17,26 +17,34 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
  */
 
-#ifndef H_DISK
-#define H_DISK
-
-#include <binio.h>
+#ifndef H_SDL
+#define H_SDL
 
 #include "output.h"
 
-class DiskWriter: public EmuPlayer
+#include "SDL.h"
+#include "SDL_mutex.h"
+#include "SDL_thread.h"
+
+#define SDL_BUFFER_SIZE 8192
+
+class SDLPlayer: public EmuPlayer
 {
 public:
-  DiskWriter(const char *filename, unsigned char nbits, unsigned char nchannels,
-	     unsigned long nfreq);
-  virtual ~DiskWriter();
+  SDLPlayer(unsigned char bits, int channels, int freq);
+  virtual ~SDLPlayer();
 
 protected:
   virtual void output(const void *buf, unsigned long size);
 
 private:
-  binostream	*f;
-  unsigned long samplesize;
+  SDL_semaphore* datastream;
+  int DataReady;
+  unsigned char* playbuf;
+  unsigned long  playsize;
+  unsigned long  played;
+
+  static void callback(void *userdata, Uint8 *stream, int len);
 };
 
 #endif
