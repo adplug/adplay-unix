@@ -1,7 +1,12 @@
-bin_PROGRAMS=adplay
+bin_PROGRAMS = adplay
 
-adplay_SOURCES=adplay.cc adplay.1 system.h aclocal.m4 getopt.c getopt1.c getopt.h
-adplay_LDADD=-ladplug
+adplay_SOURCES = adplay.cc system.h aclocal.m4 getopt.c getopt1.c \
+		getopt.h
+adplay_LDFLAGS = -ladplug
 
-#  install the man pages
-man_MANS=adplay.1
+CFLAGS = -Wall
+CXXFLAGS = -Wall
+
+man_MANS = adplay.1
+
+EXTRA_DIST = $(man_MANS)
