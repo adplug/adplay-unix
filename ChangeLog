@@ -1,3 +1,46 @@
+2004-10-01 17:11  dynamite
+
+	* src/adplay.cc: Fixed getopt on OS X and SunOS.
+
+2004-10-01 12:44  dynamite
+
+	* README, doc/adplay.1, src/adplay.cc, src/alsa.cc: Fixed ALSA
+	driver. Updated documentation.
+
+2004-05-13 11:57  dynamite
+
+	* src/: adplay.cc, alsa.cc, alsa.h, disk.cc, disk.h, esound.cc,
+	esound.h, oss.cc, oss.h, output.cc, output.h, sdl.cc, sdl.h: Added
+	multiple emulator support.
+
+2003-05-04 00:35  dynamite
+
+	* src/sdl.h: Done something with SDL player. ;)
+
+2003-03-28 11:58  dynamite
+
+	* NEWS, TODO, acinclude.m4, configure.in, src/Makefile.am,
+	src/adplay.cc, src/players.h, src/sdl.cc, src/alsa.cc, src/alsa.h:
+	Added ALSA output (still buggy).
+
+2003-03-19 12:53  dynamite
+
+	* AUTHORS, NEWS, adplay.qpg, adplay.spec, configure.in: Bumped
+	version number.
+
+2003-03-18 15:28  dynamite
+
+	* Makefile.am: Added missing files to archive. RC4.
+
+2003-03-18 15:20  dynamite
+
+	* src/Makefile.am: UNIX build fixes. RC3.
+
+2003-03-18 15:09  dynamite
+
+	* ChangeLog, adplay_mdk.spec: Removed mandrake spec file. Release
+	Candidate #2.
+
 2003-03-18 14:45  dynamite
 
 	* configure.in: RC1.
