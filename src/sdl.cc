@@ -17,6 +17,7 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
  */
 
+#include "defines.h"
 #include "sdl.h"
 
 SDLPlayer::SDLPlayer(unsigned char bits, int channels, int freq)
@@ -28,16 +29,17 @@ SDLPlayer::SDLPlayer(unsigned char bits, int channels, int freq)
 
    if (SDL_Init(SDL_INIT_AUDIO) < 0)
    {
+      message(MSG_ERROR, "unable to initialize SDL -- %s", SDL_GetError());
       exit(EXIT_FAILURE);
    }
 
-   datastream=SDL_CreateSemaphore(1);
-   DataReady=0;
+   datastream = SDL_CreateSemaphore(1);
+   DataReady = 0;
 
    spec.freq = freq;
    if (bits==16)
    {
-      spec.format = AUDIO_S16LSB;
+      spec.format = AUDIO_S16SYS;
    }
    else
    {
@@ -50,6 +52,7 @@ SDLPlayer::SDLPlayer(unsigned char bits, int channels, int freq)
 
    if (SDL_OpenAudio(&spec, NULL) < 0)
    {
+      message(MSG_ERROR, "unable to open audio -- %s", SDL_GetError());
       exit(EXIT_FAILURE);
    }
 
@@ -58,28 +61,29 @@ SDLPlayer::SDLPlayer(unsigned char bits, int channels, int freq)
 
 SDLPlayer::~SDLPlayer()
 {
-   SDL_CloseAudio();
-   SDL_DestroySemaphore(datastream);
+  if (!SDL_WasInit(SDL_INIT_AUDIO)) return;
+
+  message(MSG_DEBUG, "deinit!");
+
+  SDL_CloseAudio();
+  SDL_DestroySemaphore(datastream);
+  SDL_Quit();
 }
 
 void SDLPlayer::callback(void *userdata, Uint8 *stream, int len)
 {
-   SDLPlayer* self=(SDLPlayer *)userdata;
+   SDLPlayer *self = (SDLPlayer *)userdata;
 
    if (self->DataReady==1)
    {
       memcpy(stream, self->playbuf, len);
-      self->played+=len;
-      self->playbuf+=len;
-      if (self->playsize<=self->played)
+      self->played += len;
+      self->playbuf += len;
+      if (self->playsize <= self->played)
       {
-         self->DataReady=0;
+         self->DataReady = 0;
          SDL_SemPost(self->datastream);
       }
-   }
-   else
-   {
-      // buffer underrun.
    }
 }
 
@@ -87,8 +91,8 @@ void SDLPlayer::output(const void *buf, unsigned long size)
 {
    SDL_SemWait(datastream);
 
-   played=0;
-   playbuf=(unsigned char*)buf;
-   playsize=size;
-   DataReady=1;
+   played = 0;
+   playbuf = (unsigned char*)buf;
+   playsize = size;
+   DataReady = 1;
 }
