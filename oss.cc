@@ -17,6 +17,7 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -26,16 +27,21 @@
 
 #include "oss.h"
 
+#define DEFAULT_DEVICE	"/dev/dsp"	// Default output device file
+
 OSSPlayer::OSSPlayer(const char *device, unsigned char bits, int channels,
 		     int freq, unsigned long bufsize)
   : EmuPlayer(bits,channels,freq,bufsize)
 {
   int format = (bits == 16 ? AFMT_S16_LE : AFMT_S8);
 
+  // Set to default if no device given
+  if(!device) device = DEFAULT_DEVICE;
+
   // open OSS audio device
   if((audio_fd = open(device, O_WRONLY, 0)) == -1) {
     perror(device);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   ioctl(audio_fd, SNDCTL_DSP_SETFMT, &format);

@@ -17,47 +17,19 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
  */
 
-/*
- * players.h - This header conditionally includes AdPlay's output drivers
- * and sets a reasonable default.
- */
-
-#ifndef H_PLAYERS
-#define H_PLAYERS
+#ifndef H_DEFINES
+#define H_DEFINES
 
 #include "config.h"
 
-// Enumerate ALL outputs (regardless of availability)
-enum Outputs {none, null, oss, disk, esound};
+/***** Defines *****/
 
-#define DEFAULT_DRIVER none
+// AdPlay/UNIX version string
+#define ADPLAY_VERSION "AdPlay/UNIX " VERSION
 
-// Null (silent) output
-#ifdef DRIVER_NULL
-#include "null.h"
-#undef DEFAULT_DRIVER
-#define DEFAULT_DRIVER null
-#endif
+/***** Global variables *****/
 
-// Disk writer
-#ifdef DRIVER_DISK
-#include "disk.h"
-#undef DEFAULT_DRIVER
-#define DEFAULT_DRIVER disk
-#endif
-
-// EsounD driver
-#ifdef DRIVER_ESOUND
-#include "esound.h"
-#undef DEFAULT_DRIVER
-#define DEFAULT_DRIVER esound
-#endif
-
-// OSS driver
-#ifdef DRIVER_OSS
-#include "oss.h"
-#undef DEFAULT_DRIVER
-#define DEFAULT_DRIVER oss
-#endif
+// Program executable name
+extern const char *program_name;
 
 #endif

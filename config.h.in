@@ -3,6 +3,9 @@
 /* Build disk writer */
 #undef DRIVER_DISK
 
+/* Build EsounD output */
+#undef DRIVER_ESOUND
+
 /* Build null output */
 #undef DRIVER_NULL
 
@@ -17,6 +20,9 @@
 
 /* Define to 1 if you have the `adplug' library (-ladplug). */
 #undef HAVE_LIBADPLUG
+
+/* Define to 1 if you have the `stdc++' library (-lstdc++). */
+#undef HAVE_LIBSTDC__
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H

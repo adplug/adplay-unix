@@ -17,7 +17,11 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
  */
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
+#include "defines.h"
 #include "disk.h"
 
 DiskWriter::DiskWriter(const char *filename, unsigned char nbits, unsigned char nchannels,
@@ -36,7 +40,19 @@ DiskWriter::DiskWriter(const char *filename, unsigned char nbits, unsigned char 
 		    getsampsize(), nbits,
 		    0x61746164l, 0l };
 
-  f = fopen(filename,"wb");
+  if(!filename) {
+    printf("%s: No output filename specified!\n", program_name);
+    exit(EXIT_FAILURE);
+  }
+
+  // If filename is '-', output to stdout
+  if(strcmp(filename, "-")) {
+    if(!(f = fopen(filename,"wb"))) {
+      perror(filename);
+      exit(EXIT_FAILURE);
+    }
+  } else
+    f = stdout;
 
   // Write Microsoft RIFF WAVE header
   fwrite(&riff_header,sizeof(riff_header),1,f);

@@ -17,47 +17,22 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
  */
 
-/*
- * players.h - This header conditionally includes AdPlay's output drivers
- * and sets a reasonable default.
- */
+#ifndef H_ESOUND
+#define H_ESOUND
 
-#ifndef H_PLAYERS
-#define H_PLAYERS
+#include "output.h"
 
-#include "config.h"
+class EsoundPlayer: public EmuPlayer
+{
+public:
+  EsoundPlayer(unsigned char bits, int channels, int freq, const char *url = 0);
+  virtual ~EsoundPlayer();
 
-// Enumerate ALL outputs (regardless of availability)
-enum Outputs {none, null, oss, disk, esound};
+protected:
+  virtual void output(const void *buf, unsigned long size);
 
-#define DEFAULT_DRIVER none
-
-// Null (silent) output
-#ifdef DRIVER_NULL
-#include "null.h"
-#undef DEFAULT_DRIVER
-#define DEFAULT_DRIVER null
-#endif
-
-// Disk writer
-#ifdef DRIVER_DISK
-#include "disk.h"
-#undef DEFAULT_DRIVER
-#define DEFAULT_DRIVER disk
-#endif
-
-// EsounD driver
-#ifdef DRIVER_ESOUND
-#include "esound.h"
-#undef DEFAULT_DRIVER
-#define DEFAULT_DRIVER esound
-#endif
-
-// OSS driver
-#ifdef DRIVER_OSS
-#include "oss.h"
-#undef DEFAULT_DRIVER
-#define DEFAULT_DRIVER oss
-#endif
+private:
+  int socket;
+};
 
 #endif

@@ -1,5 +1,5 @@
 # Tell autoconf we're compiling a C++ program using automake and libtool.
-AC_INIT(adplay,1.2)
+AC_INIT(adplay,1.3)
 AC_CONFIG_SRCDIR(adplay.cc)
 AC_CONFIG_FILES(Makefile)
 AM_INIT_AUTOMAKE
@@ -12,54 +12,63 @@ AC_PROG_INSTALL
 AC_PROG_CC
 AC_PROG_CXX
 
-# Nothing works without the AdPlug core library...
-AC_CHECK_LIB(adplug,main,,[AC_MSG_ERROR([AdPlug not found!])])
+# Nothing works without these libraries...
+AC_CHECK_LIB(stdc++,main,,AC_MSG_ERROR([libstdc++ not installed ***]))
+AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([AdPlug >= 1.1 not installed ***]))
 
 ##### Output mechanism checks #####
 # These checks enable or disable certain output mechanisms,
 # depending on system facilities and user requests.
 
-AC_MSG_NOTICE([Configuring output mechanisms:])
-
 # Define user option arguments
 AC_ARG_ENABLE([output-oss],AC_HELP_STRING([--disable-output-oss],[Disable OSS output]))
 AC_ARG_ENABLE([output-null],AC_HELP_STRING([--disable-output-null],[Disable null output]))
 AC_ARG_ENABLE([output-disk],AC_HELP_STRING([--disable-output-disk],[Disable disk writer]))
+AC_ARG_ENABLE([output-esound],AC_HELP_STRING([--disable-output-esound],[Disable EsounD output]))
 
 # Check if we can compile the enabled drivers:
 # OSS driver
-AC_MSG_CHECKING([for OSS driver])
-if test ${enable_output_oss:-yes} = no; then
-	AC_MSG_RESULT([disabled])
-else
-	AC_TRY_CPP([[#include <fcntl.h>\
-	#include <sys/ioctl.h>\
-	#include <sys/soundcard.h>]],
-		 AC_DEFINE(DRIVER_OSS,1,[Build OSS driver])
-		 drivers=$drivers' oss.$(OBJEXT)'
-		 AC_MSG_RESULT([enabled]),
-		 AC_MSG_RESULT([no OSS headers found! -- disabled]))
+if test ${enable_output_oss:=yes} = yes; then
+   AC_CHECKING([for OSS headers])
+   AC_TRY_CPP([[#include <fcntl.h>\
+			 #include <sys/ioctl.h>\
+			 #include <sys/soundcard.h>]],
+	AC_DEFINE(DRIVER_OSS,1,[Build OSS driver])
+	drivers=$drivers' oss.$(OBJEXT)'
+	AC_MSG_RESULT([found]),
+	AC_MSG_RESULT([not found -- OSS output disabled]))
 fi
 
 # Null output
-AC_MSG_CHECKING([for null output])
-if test ${enable_output_null:-yes} = no; then
-	AC_MSG_RESULT([disabled])
-else
+if test ${enable_output_null:=yes} = yes; then
    AC_DEFINE(DRIVER_NULL,1,[Build null output])
-   AC_MSG_RESULT([enabled])
 fi
 
 # Disk writer
-AC_MSG_CHECKING([for disk writer])
-if test ${enable_output_disk:-yes} = no; then
-	AC_MSG_RESULT([disabled])
-else
+if test ${enable_output_disk:=yes} = yes; then
    AC_DEFINE(DRIVER_DISK,1,[Build disk writer])
    drivers=$drivers' disk.$(OBJEXT)'
-   AC_MSG_RESULT([enabled])
+fi
+
+# EsounD output
+if test ${enable_output_esound:=yes} = yes; then
+   AM_PATH_ESD(0.2.8,
+      AC_DEFINE(DRIVER_ESOUND,1,[Build EsounD output])
+      drivers=$drivers' esound.$(OBJEXT)',
+      AC_MSG_RESULT([*** EsounD (libesd) >= 0.2.8 not installed ***]))
 fi
 
 AC_SUBST([drivers])
 
 AC_OUTPUT
+
+# Display user informative configuration output
+echo ""
+echo "Configuration:"
+echo "Install path:             ${prefix}"
+echo ""
+echo "Build output mechanisms:"
+echo "OSS Driver (oss):         ${enable_output_oss}"
+echo "Null output (null):       ${enable_output_null}"
+echo "Disk writer (disk):       ${enable_output_disk}"
+echo "EsounD output (esound):   ${enable_output_esound}"

@@ -1,3 +1,4 @@
 AdPlay/UNIX To Do List:
 -----------------------
-- ALSA and EsounD output support
+- ALSA, EsounD and SDL output support. [dynamite]
+- Make unix module, using linux directory, in SourceForge CVS. [dynamite]

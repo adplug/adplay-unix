@@ -25,18 +25,14 @@
 #include <adplug/adplug.h>
 #include <adplug/emuopl.h>
 
-#include "config.h"
+#include "defines.h"
 #include "getopt.h"
 #include "output.h"
 #include "players.h"
 
-/***** defines *****/
-// AdPlay/UNIX version string
-#define ADPLAY_VERSION "AdPlay/UNIX " VERSION
-
 /***** global variables *****/
-static const char *program_name;	// Program executable name
-static Player *player = 0; // global player object
+const char *program_name;
+static Player *player = 0;		// global player object
 
 /***** configuration (and defaults) *****/
 static struct {
@@ -45,7 +41,7 @@ static struct {
   char *device;
   bool endless, showinsts, songinfo, songmessage;
   Outputs output;
-} cfg = { 512, 44100, 1, 16, 0, "/dev/dsp", true, false, false, false, DEFAULT_DRIVER };
+} cfg = { 512, 44100, 1, 16, 0, 0, true, false, false, false, DEFAULT_DRIVER };
 
 /***** local functions *****/
 
@@ -63,6 +59,9 @@ OSS driver (oss) specific:\n\
 \n\
 Disk writer (disk) specific:\n\
   -d, --device=FILE          output to FILE\n\
+\n\
+EsounD driver (esound) specific:\n\
+  -d, --device=URL           URL to EsounD server host (hostname:port)\n\
 \n\
 Playback quality:\n\
   -8, --8bit                 8-bit sample quality\n\
@@ -94,6 +93,9 @@ Generic:\n\
 #endif
 #ifdef DRIVER_DISK
   cout << "disk ";
+#endif
+#ifdef DRIVER_ESOUND
+  cout << "esound ";
 #endif
   cout << endl;
 
@@ -148,10 +150,11 @@ static int decode_switches(int argc, char **argv)
 	    if(!strcmp(optarg,"disk")) {
 	      cfg.output = disk;
 	      cfg.endless = false; // endless output is almost never desired here...
-	    } else {
-	      cout << program_name << ": unknown output method -- " << optarg << endl;
-	      exit(EXIT_FAILURE);
-	    }
+	    } else
+	      if(!strcmp(optarg,"esound")) cfg.output = esound; else {
+		cout << program_name << ": unknown output method -- " << optarg << endl;
+		exit(EXIT_FAILURE);
+	      }
 	break;
       }
   }
@@ -250,6 +253,9 @@ int main(int argc, char **argv)
 #endif
 #ifdef DRIVER_DISK
   case disk: player = new DiskWriter(cfg.device, cfg.bits, cfg.channels, cfg.freq); break;
+#endif
+#ifdef DRIVER_ESOUND
+  case esound: player = new EsoundPlayer(cfg.bits, cfg.channels, cfg.freq, cfg.device); break;
 #endif
   default:
     cout << program_name << ": output method not available!" << endl;
