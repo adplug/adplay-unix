@@ -15,7 +15,7 @@ The following libraries are needed in order to compile this program:
 
 Library		Version
 -------		-------
-AdPlug		>= 1.1
+AdPlug		>= 1.4
 
 CVS
 ---

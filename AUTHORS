@@ -7,3 +7,9 @@ Additional Credits:
 Goetz Waschk <waschk@informatik.uni-rostock.de>:
   - Mandrake Linux packages
   - Red Hat & Mandrake RPM spec files
+
+Mike Gorchak <mike@malva.ua>:
+  - QNX Sound Architecture (QSA) output driver
+  - Simple Directmedia Layer (SDL) output driver
+  - QNX packages
+  - QNX qpg file

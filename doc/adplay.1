@@ -13,7 +13,7 @@
 .\" along with this program; see the file COPYING.  If not, write to
 .\" the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 .\"
-.TH ADPLAY 1 "November 14, 2002" "AdPlay/UNIX 1.3" "User Commands"
+.TH ADPLAY 1 "February 23, 2003" "AdPlay/UNIX 1.3" "User Commands"
 .SH NAME
 adplay \- AdPlay/UNIX console-based OPL2 audio player
 .SH SYNOPSIS
@@ -33,31 +33,38 @@ otherwise.
 .SH OUTPUT MECHANISMS
 .PP
 AdPlay/UNIX can play back using many different output mechanisms,
-which can be selected with the \fB-O\fP argument. The availability of a
-method depends on compile-time settings. Available methods are printed
-out after the help text, displayed with \fB--help\fP.
+which can be selected with the \fB-O\fP argument. The availability of
+a method depends on compile-time settings. Available methods are
+printed out after the help text, displayed with \fB--help\fP.
 .PP
-Next is a brief description of all output mechanisms, following their abbreviations:
+Next is a brief description of all output mechanisms, following their
+abbreviations:
 .SS oss -- Open Sound System (OSS) driver
 .PP
-This is the standard old-school output, available on most Linux and
-other UNIX systems. This is most certainly what you want.
+This output method is available on most Linux and other UNIX systems.
 .SS null -- Total silence
 .PP
-This output discards anything sent to it. Can be useful for testing
-purposes.
+Discards anything sent to it. It can be useful for testing purposes.
 .SS disk -- Disk writer
 .PP
 Writes its output to a file in Microsoft RIFF WAVE format.
 .SS esound -- EsounD output
 .PP
-Creates a TCP/IP connection to an EsounD server and streams the audio
+Creates a socket connection to an EsounD server and streams the audio
 to it.
+.SS qsa -- QNX Sound Architecture (QSA) driver
+.PP
+Uses the QNX system's standard output method.
+.SS sdl -- Simple Directmedia Layer (SDL) driver
+.PP
+Uses the SDL library for sound output. The library has a broader
+platform support than any of the other output methods. Thus, it could
+be useful on some exotic systems.
 .SH OPTIONS
 .PP
 The order of the option commandline parameters is not important,
 except for the \fB-d\fP option, which always has to be specified after
-a \fB-O\fP option.
+an \fB-O\fP option.
 .SS "Output selection:"
 .TP
 .B -O, --output=OUTPUT
@@ -79,9 +86,9 @@ default.
 .TP
 .B -d --device=FILE
 Write sound data to FILE. The data is written in Microsoft RIFF WAVE
-format. You can specify a single '-' to write to stdout instead. This
-option has no default and must be specified when the disk writer is to
-be used!
+format (little-endian). You can specify a single '-' to write to
+stdout instead. This option has no default and must be specified when
+the disk writer is to be used!
 .SS "EsounD output (esound) specific:"
 .TP
 .B -d --device=URL
@@ -127,6 +134,17 @@ file formats that support multiple subsongs.
 Play just once, don't loop. This will exit \fBadplay\fP after the song
 ended. This is the default when multiple \fBFILEs\fP are given.
 .SS "Generic:"
+.TP
+.B -D, --database=FILE
+Additionally use database file FILE. This option may be specified
+multiple times. Each database file is additionally merged with the
+others, creating one large database on the fly.
+.TP
+.B -q, --quiet
+Be more quiet.
+.TP
+.B -v, --verbose
+Be more verbose.
 .TP
 .B -h, --help
 Show summary of options.
