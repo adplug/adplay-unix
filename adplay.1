@@ -13,7 +13,7 @@
 .\" along with this program; see the file COPYING.  If not, write to
 .\" the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 .\"
-.TH ADPLAY 1 "March 13, 2002" GNU "AdPlay"
+.TH ADPLAY 1 "June 13, 2002" GNU "AdPlay"
 .\" Please update the above date whenever this man page is modified.
 .\"
 .\" Some roff macros, for reference:
@@ -42,52 +42,51 @@ also be accomplished with only one file, by using the \fB-o\fP option.
 .SH EXIT STATUS
 \fBadplay\fP returns 0 on successful operation. 1 is returned otherwise.
 .SH OPTIONS
-\fBadplay\fP accepts the following options:
 .TP
 .B \-8, \-\-8bit
 Use only 8-bit samples for playback.
 .TP
 .B \-\-16bit
-Use only 16-bit samples for playback. This is the default.
+Use only 16-bit samples for playback (default).
 .TP
 .B \-f, \-\-freq=FREQ
-Set playback frequency to FREQ, in Hz. This is set to 44100Hz by default.
+Set playback frequency to FREQ, in Hz. This is 44100Hz by default.
 .TP
 .B \-\-stereo
 Use only stereo samples for playback. The sound stream is just doubled, no
-further audio processing is done. This option is pretty useless, if you
-don't have obscure audio hardware that only accepts stereo streams, because
-the OPL2 only generates mono sound.
+further audio processing is done. This option is pretty useless unless you
+have very obscure audio hardware that only accepts stereo streams. AdPlug
+only generates mono streams because the OPL2 only generates mono sound.
 .TP
 .B \-\-mono
-Use only mono samples for playback. This is the default.
+Use only mono samples for playback (default).
 .TP
 .B \-b \-\-buffer=SIZE
 Set sound buffer size to SIZE samples. If you notice sound skipping with the
 default setting, try a greater buffer size. Note that this is measured in
-samples, not bytes! This is set to 512 samples by default.
+samples, not bytes! This is 512 samples by default.
 .TP
 .B \-d \-\-device=FILE
 Set sound output device file to FILE. Right now, only OSS compatible devices
-are supported. This is set to \fB/dev/dsp\fP by default.
+are supported. This is \fB/dev/dsp\fP by default.
 .TP
 .B \-i \-\-instruments
-Display instrument names (if available) after the file type information.
+Display instrument names (if available).
 .TP
 .B \-r \-\-realtime
-Display realtime playback informations, while playing. This will display a
+Display realtime playback information, while playing. This will display a
 one-line status bar, containing essential playback information.
 .TP
 .B \-m \-\-message
-Display the song message (if available) after the file type information.
+Display the song message (if available).
 .TP
 .B \-s \-\-subsong=N
 Play subsong number N, instead of the first subsong. Only useful for
 file formats that support multiple subsongs.
 .TP
 .B \-o \-\-once
-Play only once, don't loop. This will exit \fBadplay\fP after the song
-ended. This option is set by default, if multiple \fBFILEs\fP are given.
+Play just once, don't loop. This will exit \fBadplay\fP after the song
+ended. This is the default when multiple \fBFILEs\fP are given.
 .TP
 .B \-h, \-\-help
 Show summary of options.
