@@ -1,9 +1,9 @@
 # Tell autoconf we're compiling a C++ program using automake and libtool.
 AC_INIT(adplay,1.3)
-AC_CONFIG_SRCDIR(adplay.cc)
-AC_CONFIG_FILES(Makefile)
+AC_CONFIG_SRCDIR(src/adplay.cc)
+AC_CONFIG_FILES(Makefile src/Makefile doc/Makefile)
 AM_INIT_AUTOMAKE
-AM_CONFIG_HEADER(config.h)
+AM_CONFIG_HEADER(src/config.h)
 AM_PROG_LIBTOOL
 AC_LANG(C++)
 
@@ -13,8 +13,8 @@ AC_PROG_CC
 AC_PROG_CXX
 
 # Nothing works without these libraries...
-AC_CHECK_LIB(stdc++,main,,AC_MSG_ERROR([libstdc++ not installed ***]))
-AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([AdPlug >= 1.1 not installed ***]))
+AC_CHECK_LIB(stdc++,main,,AC_MSG_ERROR([libstdc++ not installed]))
+AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([AdPlug >= 1.1 not installed]))
 
 ##### Output mechanism checks #####
 # These checks enable or disable certain output mechanisms,
