@@ -18,3 +18,5 @@ INSTALL
 autom4te.cache
 libtool
 ltmain.sh
+config.h
+stamp-h?

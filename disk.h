@@ -35,6 +35,7 @@ protected:
 
 private:
   FILE *f;
+  unsigned long samplesize;
 };
 
 #endif

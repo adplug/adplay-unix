@@ -17,44 +17,38 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
  */
 
-#ifndef H_OUTPUT
-#define H_OUTPUT
+/*
+ * players.h - This header conditionally includes AdPlay's output drivers
+ * and sets a reasonable default.
+ */
 
-#include <adplug/player.h>
-#include <adplug/emuopl.h>
+#ifndef H_PLAYERS
+#define H_PLAYERS
 
-class Player
-{
-public:
-  CPlayer *p;
-  bool playing;
+#include "config.h"
 
-  Player();
-  virtual ~Player();
+// Enumerate ALL outputs (regardless of availability)
+enum Outputs {none, null, oss, disk};
 
-  virtual void frame() = 0;
-  virtual Copl *get_opl() = 0;
-};
+#define DEFAULT_DRIVER none
 
-class EmuPlayer: public Player
-{
-public:
-  EmuPlayer(unsigned char nbits, unsigned char nchannels, unsigned long nfreq, unsigned long nbufsize = 512);
-  virtual ~EmuPlayer();
+// Null (silent) output
+#ifdef DRIVER_NULL
+#include "null.h"
+#undef DEFAULT_DRIVER
+#define DEFAULT_DRIVER null
+#endif
 
-  virtual void frame();
-  virtual Copl *get_opl();
+// Disk writer
+#ifdef DRIVER_DISK
+#include "disk.h"
+#endif
 
-protected:
-  virtual void output(const void *buf, unsigned long size) = 0;
-
-  unsigned char getsampsize();
-
-private:
-  CEmuopl opl; // OPL2 emulator
-  char *audiobuf;
-  unsigned long buf_size, freq;
-  unsigned char bits, channels;
-};
+// OSS driver
+#ifdef DRIVER_OSS
+#include "oss.h"
+#undef DEFAULT_DRIVER
+#define DEFAULT_DRIVER oss
+#endif
 
 #endif

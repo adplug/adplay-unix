@@ -2,7 +2,12 @@ This is a brief overview of user-visible changes in adplay.
 
 Changes for version 1.2:
 	- Updated man page.
-	- Some more build fixes.
+	- Many build fixes.
+	- Modularized output system.
+	- Added the following output mechanisms:
+		- oss: Open Sound System (OSS) driver
+		- null: Null (silent) output
+		- disk: Disk writer
 
 Changes for version 1.1:
 	- Rewrote using GNU autotools.

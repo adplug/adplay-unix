@@ -15,70 +15,106 @@
 .\"
 .TH ADPLAY 1 "October 7, 2002" "AdPlay/UNIX 1.2" "User Commands"
 .SH NAME
-adplay \- UNIX console-based OPL2 audio player
+adplay \- AdPlay/UNIX console-based OPL2 audio player
 .SH SYNOPSIS
 .B adplay
 .RI "[OPTION]... FILE..."
 .SH DESCRIPTION
 AdPlay/UNIX is AdPlug's UNIX console-based frontend. It tries to play
-back all given FILEs.
+back all given FILEs, using one of many available output mechanisms.
 .PP
 AdPlay/UNIX plays endlessly, if only one file is given. With multiple files,
 it plays them in a sequence and exits after the last file. The same can
-also be accomplished with only one file, by using the \fB-o\fP option.
+also be accomplished with only one file, by using the \fB-o\fP
+option. When using the disk writer, \fB-o\fP is implied.
 .SH EXIT STATUS
-\fBadplay\fP returns 0 on successful operation. 1 is returned otherwise.
+\fBadplay\fP returns 0 on successful operation. 1 is returned
+otherwise.
+.SH OUTPUT MECHANISMS
+.PP
+AdPlay/UNIX can play back using many different output mechanisms,
+which can be selected with the \fB-O\fP argument. The availability of a
+method depends on compile-time settings. Available methods are printed
+out with the help text, displayed with \fB--help\fP.
+.PP
+Next is a brief description of all output mechanisms, following their abbreviations:
+.SS oss -- Open Sound System (OSS) driver
+.PP
+This is the standard old-school output, available on most Linux and
+other UNIX systems. This is most certainly what you want.
+.SS null -- Total silence
+.PP
+This output discards anything sent to it. Can be useful for testing
+purposes.
+.SS disk -- Disk writer
+.PP
+Writes its output to a file in Microsoft RIFF WAVE format.
 .SH OPTIONS
+.SS "Output selection:"
 .TP
-.B \-8, \-\-8bit
+.B -O, --output=OUTPUT
+Specify output mechanism. Available mechanisms depend on compilation
+settings and are printed on \fB--help\fP output. The default also
+depends on compile-time settings.
+.SS "OSS driver (oss) specific:"
+.TP
+.B -b --buffer=SIZE
+Set sound buffer size to SIZE samples. If you notice sound skipping with the
+default setting, try a greater buffer size. Note that this is measured in
+samples, not bytes! This is 512 samples by default.
+.TP
+.B -d --device=FILE
+Set sound output device file to FILE. This is \fB/dev/dsp\fP by
+default.
+.SS "Disk writer (disk) specific:"
+.TP
+.B -d --device=FILE
+Write sound data to FILE. The data is written in Microsoft RIFF WAVE format.
+.SS "Playback quality:"
+.TP
+.B -8, --8bit
 Use only 8-bit samples for playback.
 .TP
-.B \-\-16bit
+.B --16bit
 Use only 16-bit samples for playback (default).
 .TP
-.B \-f, \-\-freq=FREQ
+.B -f, --freq=FREQ
 Set playback frequency to FREQ, in Hz. This is 44100Hz by default.
 .TP
-.B \-\-stereo
+.B --stereo
 Use only stereo samples for playback. The sound stream is just doubled, no
 further audio processing is done. This option is pretty useless unless you
 have very obscure audio hardware that only accepts stereo streams. AdPlug
 only generates mono streams because the OPL2 only generates mono sound.
 .TP
-.B \-\-mono
+.B --mono
 Use only mono samples for playback (default).
+.SS "Informative output:"
 .TP
-.B \-b \-\-buffer=SIZE
-Set sound buffer size to SIZE samples. If you notice sound skipping with the
-default setting, try a greater buffer size. Note that this is measured in
-samples, not bytes! This is 512 samples by default.
-.TP
-.B \-d \-\-device=FILE
-Set sound output device file to FILE. Right now, only OSS compatible devices
-are supported. This is \fB/dev/dsp\fP by default.
-.TP
-.B \-i \-\-instruments
+.B -i --instruments
 Display instrument names (if available).
 .TP
-.B \-r \-\-realtime
+.B -r --realtime
 Display realtime playback information, while playing. This will display a
 one-line status bar, containing essential playback information.
 .TP
-.B \-m \-\-message
+.B -m --message
 Display the song message (if available).
 .TP
-.B \-s \-\-subsong=N
+.SS "Playback:"
+.B -s --subsong=N
 Play subsong number N, instead of the first subsong. Only useful for
 file formats that support multiple subsongs.
 .TP
-.B \-o \-\-once
+.B -o --once
 Play just once, don't loop. This will exit \fBadplay\fP after the song
 ended. This is the default when multiple \fBFILEs\fP are given.
+.SS "Generic:"
 .TP
-.B \-h, \-\-help
+.B -h, --help
 Show summary of options.
 .TP
-.B \-V, \-\-version
+.B -V, --version
 Show version of program.
 .SH AUTHOR
 Simon Peter <dn.tlp@gmx.net>

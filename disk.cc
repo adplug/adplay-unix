@@ -22,17 +22,43 @@
 
 DiskWriter::DiskWriter(const char *filename, unsigned char nbits, unsigned char nchannels,
 		       unsigned long nfreq)
-  : EmuPlayer(nbits,nchannels,nfreq)
+  : EmuPlayer(nbits,nchannels,nfreq), samplesize(0)
 {
+  const struct {
+    unsigned long chunkid, chunksize, format, subchunk1id, subchunk1size;
+    unsigned short audioformat, numchannels;
+    unsigned long samplerate, byterate;
+    unsigned short blockalign, bitspersample;
+    unsigned long subchunk2id, subchunk2size;
+  } riff_header = { 0x46464952l, 36l, 0x45564157l, 0x20746d66l, 16l,
+		    1, nchannels,
+		    nfreq, nfreq * getsampsize(),
+		    getsampsize(), nbits,
+		    0x61746164l, 0l };
+
   f = fopen(filename,"wb");
+
+  // Write Microsoft RIFF WAVE header
+  fwrite(&riff_header,sizeof(riff_header),1,f);
 }
 
 DiskWriter::~DiskWriter()
 {
-  fclose(f);
+  if(samplesize % 2) { // Wave data must end on an even byte boundary
+    fputc(0, f);
+    samplesize++;
+  }
+
+  // Write file sizes
+  fseek(f, 40, SEEK_SET); fwrite(&samplesize, 4, 1, f);
+  samplesize += 36; // make absolute filesize (add header size)
+  fseek(f, 4, SEEK_SET); fwrite(&samplesize, 4, 1, f);
+
+  fclose(f); // end disk writing
 }
 
 void DiskWriter::output(const void *buf, unsigned long size)
 {
   fwrite(buf,size,1,f);
+  samplesize += size;
 }

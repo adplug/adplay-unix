@@ -25,30 +25,29 @@
 #include <adplug/adplug.h>
 #include <adplug/emuopl.h>
 
+#include "config.h"
 #include "getopt.h"
 #include "output.h"
-#include "oss.h"
-#include "null.h"
-#include "disk.h"
+#include "players.h"
 
-// defines
-#define ADPLAY_VERSION	"AdPlay/UNIX " VERSION	// AdPlay/UNIX version string
+/***** defines *****/
+// AdPlay/UNIX version string
+#define ADPLAY_VERSION "AdPlay/UNIX " VERSION
 
-// typedefs
-enum Outputs {null, oss, disk};
-
-// global variables
+/***** global variables *****/
 static const char *program_name;	// Program executable name
 static Player *player = 0; // global player object
 
-// Configuration (and defaults)
+/***** configuration (and defaults) *****/
 static struct {
   int buf_size, freq, channels, bits;
   unsigned int subsong;
   char *device;
   bool endless, showinsts, songinfo, songmessage;
   Outputs output;
-} cfg = { 512, 44100, 1, 16, 0, "/dev/dsp", true, false, false, false, oss };
+} cfg = { 512, 44100, 1, 16, 0, "/dev/dsp", true, false, false, false, DEFAULT_DRIVER };
+
+/***** local functions *****/
 
 static void usage(int exit_status)
 /* Print usage information and exit with exit_status. */
@@ -56,8 +55,7 @@ static void usage(int exit_status)
   cout << "Usage: " << program_name << " [OPTION]... FILE..." << endl;
   cout << "\
 Output selection:\n\
-  -O, --output=OUTPUT        Specify output mechanism:\n\
-                               oss, null, disk\n\
+  -O, --output=OUTPUT        Specify output mechanism.\n\
 \n\
 OSS driver (oss) specific:\n\
   -d, --device=FILE          set sound device file to FILE\n\
@@ -84,7 +82,20 @@ Playback:
 \n\
 Generic:\n\
   -h, --help                 display this help and exit\n\
-  -V, --version              output version information and exit" << endl;
+  -V, --version              output version information and exit" << endl << endl;
+
+  // Build list of available output mechanisms
+  cout << "Available output mechanisms: ";
+#ifdef DRIVER_OSS
+  cout << "oss ";
+#endif
+#ifdef DRIVER_NULL
+  cout << "null ";
+#endif
+#ifdef DRIVER_DISK
+  cout << "disk ";
+#endif
+  cout << endl;
 
   exit(exit_status);
 }
@@ -129,7 +140,7 @@ static int decode_switches(int argc, char **argv)
       case 'm': cfg.songmessage = true; break;
       case 's': cfg.subsong = atoi(optarg); break;
       case 'o': cfg.endless = false; break;
-      case 'V': puts(ADPLAY_VERSION); exit(0);
+      case 'V': puts(ADPLAY_VERSION); exit(EXIT_SUCCESS);
       case 'h':	usage(0); break;
       case 'O':
 	if(!strcmp(optarg,"oss")) cfg.output = oss; else
@@ -139,7 +150,7 @@ static int decode_switches(int argc, char **argv)
 	      cfg.endless = false; // endless output is almost never desired here...
 	    } else {
 	      cout << program_name << ": unknown output method -- " << optarg << endl;
-	      exit(1);
+	      exit(EXIT_FAILURE);
 	    }
 	break;
       }
@@ -203,9 +214,11 @@ static void sighandler(int signal)
   switch(signal) {
   case SIGINT:
   case SIGTERM:
-    exit(0);
+    exit(EXIT_SUCCESS);
   }
 }
+
+/***** main program *****/
 
 int main(int argc, char **argv)
 {
@@ -226,10 +239,21 @@ int main(int argc, char **argv)
 
   // init player
   switch(cfg.output) {
+  case none:
+    cout << program_name <<": you got NO output mechanisms compiled in! You must be crazy..." << endl;
+    exit(EXIT_FAILURE);
+#ifdef DRIVER_OSS
   case oss: player = new OSSPlayer(cfg.device, cfg.bits, cfg.channels, cfg.freq, cfg.buf_size); break;
+#endif
+#ifdef DRIVER_NULL
   case null: player = new NullOutput(); break;
+#endif
+#ifdef DRIVER_DISK
   case disk: player = new DiskWriter(cfg.device, cfg.bits, cfg.channels, cfg.freq); break;
-  default: exit(1);
+#endif
+  default:
+    cout << program_name << ": output method not available!" << endl;
+    exit(EXIT_FAILURE);
   }
 
   // play all files from commandline
@@ -237,5 +261,5 @@ int main(int argc, char **argv)
     play(argv[i],player,cfg.subsong);
 
   // deinit
-  exit(0);
+  exit(EXIT_SUCCESS);
 }
