@@ -301,7 +301,7 @@ int main(int argc, char **argv)
   // parse commandline
   optind = decode_switches(argc,argv);
   if(optind == argc) {	// no filename given
-    fprintf(stderr, "%s: need at least one file for playback", program_name);
+    fprintf(stderr, "%s: need at least one file for playback\n", program_name);
     fprintf(stderr, "Try '%s --help' for more information.\n", program_name);
     exit(EXIT_FAILURE);
   }
