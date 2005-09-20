@@ -6,10 +6,10 @@ adplay_SOURCES = adplay.cc getopt.c getopt1.c getopt.h output.cc output.h \
 EXTRA_adplay_SOURCES = oss.cc oss.h null.h disk.cc disk.h esound.cc esound.h \
 	qsa.cc qsa.h sdl.cc sdl.h alsa.cc alsa.h
 
-adplay_LDADD = @drivers@ @ESD_LIBS@ @QSA_LIBS@ @SDL_LIBS@ @ALSA_LIBS@
+adplay_LDADD = @drivers@ $(adplug_LIBS) @ESD_LIBS@ @QSA_LIBS@ @SDL_LIBS@ @ALSA_LIBS@
 adplay_DEPENDENCIES = @drivers@
 
 adplug_data_dir = $(datadir)/adplug
 
-AM_CPPFLAGS = @ESD_CFLAGS@ @SDL_CFLAGS@ @ALSA_CFLAGS@ \
+AM_CPPFLAGS = $(adplug_CFLAGS) @ESD_CFLAGS@ @SDL_CFLAGS@ @ALSA_CFLAGS@ \
 	-DADPLUG_DATA_DIR=\"$(adplug_data_dir)\"
