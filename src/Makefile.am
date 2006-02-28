@@ -9,7 +9,7 @@ EXTRA_adplay_SOURCES = oss.cc oss.h null.h disk.cc disk.h esound.cc esound.h \
 adplay_LDADD = @drivers@ $(adplug_LIBS) @ESD_LIBS@ @QSA_LIBS@ @SDL_LIBS@ @ALSA_LIBS@
 adplay_DEPENDENCIES = @drivers@
 
-adplug_data_dir = $(datadir)/adplug
+adplug_data_dir = $(sharedstatedir)/adplug
 
 AM_CPPFLAGS = $(adplug_CFLAGS) @ESD_CFLAGS@ @SDL_CFLAGS@ @ALSA_CFLAGS@ \
 	-DADPLUG_DATA_DIR=\"$(adplug_data_dir)\"
