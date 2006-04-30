@@ -13,7 +13,7 @@
 .\" along with this program; see the file COPYING.  If not, write to
 .\" the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 .\"
-.TH ADPLAY 1 "October 2, 2004" "AdPlay/UNIX 1.5" "User Commands"
+.TH ADPLAY 1 "April 29, 2006" "AdPlay/UNIX 1.6" "User Commands"
 .SH NAME
 adplay \- AdPlay/UNIX console-based OPL2 audio player
 .SH SYNOPSIS
@@ -63,6 +63,11 @@ be useful on some exotic systems.
 .SS alsa -- Advanced Linux Sound Architecture (ALSA) driver
 .PP
 Uses the standard output method on newer Linux systems.
+.SS ao -- libao driver
+.PP
+Libao is a cross-platform audio library with very broad platform
+support. Might be useful on systems, where SDL is not available, and
+generally to do tricky things.
 .SH OPTIONS
 .PP
 The order of the option commandline parameters is not important,
@@ -76,11 +81,6 @@ settings and are printed on \fB--help\fP output. A reasonable default
 is automatically selected, based on the availability of the output
 mechanisms.
 .SS "OSS driver (oss) specific:"
-.TP
-.B -b --buffer=SIZE
-Set sound buffer size to SIZE samples. If you notice sound skipping with the
-default setting, try a greater buffer size. Note that this is measured in
-samples, not bytes! This is 2048 samples by default.
 .TP
 .B -d --device=FILE
 Set sound output device file to FILE. This is \fB/dev/dsp\fP by
@@ -97,18 +97,7 @@ the disk writer is to be used!
 .B -d --device=URL
 Connect to "hostname:port" combination in URL. Example:
 "myhost.sound.net:1234". The default is "localhost:16001".
-.SS "SDL driver (sdl) specific:"
-.TP
-.B -b --buffer=SIZE
-Set sound buffer size to SIZE samples. If you notice sound skipping with the
-default setting, try a greater buffer size. Note that this is measured in
-samples, not bytes! This is 2048 samples by default.
 .SS "ALSA driver (alsa) specific:"
-.TP
-.B -b --buffer=SIZE
-Set sound buffer size to SIZE samples. If you notice sound skipping with the
-default setting, try a greater buffer size. Note that this is measured in
-samples, not bytes! This is 2048 samples by default.
 .TP
 .B -d --device=DEVICE
 Set sound output device to DEVICE. This is \fBplughw:0,0\fP by default.
@@ -131,6 +120,12 @@ only generates mono streams because the OPL2 only generates mono sound.
 .TP
 .B --mono
 Use only mono samples for playback (default).
+.TP
+.B -b --buffer=SIZE
+Set sound buffer size to SIZE samples. If you notice sound skipping with the
+default setting, try a greater buffer size. Note that this is measured in
+samples, not bytes! This is 2048 samples by default. Only the OSS,
+SDL, ALSA and libao output drivers support this option.
 .SS "Informative output:"
 .TP
 .B -i --instruments
@@ -151,7 +146,7 @@ file formats that support multiple subsongs.
 .B -o --once
 Play just once, don't loop. This will exit \fBadplay\fP after the song
 ended. This is the default when multiple \fBFILEs\fP are given.
-.SS "Generic:"
+.SS "Miscellaneous:"
 .TP
 .B -D, --database=FILE
 Additionally use database file FILE. This option may be specified

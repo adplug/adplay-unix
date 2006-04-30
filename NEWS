@@ -1,31 +1,41 @@
 This is a brief overview of user-visible changes in adplay.
 
+Changes for version 1.6:
+------------------------
+- Added the following output mechanisms:
+  - libao: libao driver
+
 Changes for version 1.5:
-	- Made compatible with AdPlug 2.0.
+------------------------
+- Made compatible with AdPlug 2.0.
 
 Changes for version 1.4:
-	- Added the following output mechanisms:
-		- alsa: Advanced Linux Sound Architecture (ALSA) driver
+------------------------
+- Added the following output mechanisms:
+  - alsa: Advanced Linux Sound Architecture (ALSA) driver
 
 Changes for version 1.3:
-	- Disk writer now writes proper files on big endian machines.
-	- AdPlug Database support.
-	- Added verbosity level options.
-	- Added the following output mechanisms:
-		- esound: EsounD (ESD) driver
-		- qsa: QNX Sound Architecture (QSA) driver
-		- sdl: Simple Directmedia Layer (SDL) driver
+------------------------
+- Disk writer now writes proper files on big endian machines.
+- AdPlug Database support.
+- Added verbosity level options.
+- Added the following output mechanisms:
+  - esound: EsounD (ESD) driver
+  - qsa: QNX Sound Architecture (QSA) driver
+  - sdl: Simple Directmedia Layer (SDL) driver
 
 Changes for version 1.2:
-	- Updated man page.
-	- Many build fixes.
-	- Modularized output system.
-	- Added the following output mechanisms:
-		- oss: Open Sound System (OSS) driver
-		- null: Null (silent) output
-		- disk: Disk writer
+------------------------
+- Updated man page.
+- Many build fixes.
+- Modularized output system.
+- Added the following output mechanisms:
+  - oss: Open Sound System (OSS) driver
+  - null: Null (silent) output
+  - disk: Disk writer
 
 Changes for version 1.1:
-	- Rewrote using GNU autotools.
-	- Wrote man page.
-	- FreeBSD fixes.
+------------------------
+- Rewrote using GNU autotools.
+- Wrote man page.
+- FreeBSD fixes.

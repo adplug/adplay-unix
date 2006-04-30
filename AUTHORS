@@ -13,3 +13,6 @@ Mike Gorchak <mike@malva.ua>:
   - Simple Directmedia Layer (SDL) output driver
   - QNX packages
   - QNX qpg file
+
+Michael Guntsche <mike@it-loops.com>:
+  - libao output driver
