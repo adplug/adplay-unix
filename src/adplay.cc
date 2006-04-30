@@ -30,7 +30,7 @@
  * Apple (OS X) and Sun systems declare getopt in unistd.h, other systems
  * (Linux) use getopt.h.
  */
-#if defined ( __APPLE__ ) || (defined(__SVR4) && defined(__sun))
+#if defined (__APPLE__) || (defined(__SVR4) && defined(__sun))
 #	include <unistd.h>
 #else
 #	include "getopt.h"
