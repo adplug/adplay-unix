@@ -7,7 +7,7 @@
 dnl AM_PATH_ESD([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl Test for ESD, and define ESD_CFLAGS and ESD_LIBS
 dnl
-AC_DEFUN(AM_PATH_ESD,
+AC_DEFUN([AM_PATH_ESD],
 [dnl 
 dnl Get the cflags and libraries from the esd-config script
 dnl
@@ -172,7 +172,7 @@ int main ()
 dnl AM_ESD_SUPPORTS_MULTIPLE_RECORD([ACTION-IF-SUPPORTS [, ACTION-IF-NOT-SUPPORTS]])
 dnl Test, whether esd supports multiple recording clients (version >=0.2.21)
 dnl
-AC_DEFUN(AM_ESD_SUPPORTS_MULTIPLE_RECORD,
+AC_DEFUN([AM_ESD_SUPPORTS_MULTIPLE_RECORD],
 [dnl
   AC_MSG_NOTICE([whether installed esd version supports multiple recording clients])
   ac_save_ESD_CFLAGS="$ESD_CFLAGS"
@@ -192,11 +192,17 @@ AC_DEFUN(AM_ESD_SUPPORTS_MULTIPLE_RECORD,
     fi
   )
 ])
+# Configure paths for SDL
+# Sam Lantinga 9/21/99
+# stolen from Manish Singh
+# stolen back from Frank Belew
+# stolen from Manish Singh
+# Shamelessly stolen from Owen Taylor
 
 dnl AM_PATH_SDL([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl Test for SDL, and define SDL_CFLAGS and SDL_LIBS
 dnl
-AC_DEFUN(AM_PATH_SDL,
+AC_DEFUN([AM_PATH_SDL],
 [dnl 
 dnl Get the cflags and libraries from the sdl-config script
 dnl
@@ -220,7 +226,7 @@ AC_ARG_ENABLE(sdltest, [  --disable-sdltest       Do not try to compile and run 
      fi
   fi
 
-  dnl AC_REQUIRE([AC_CANONICAL_TARGET])
+  AC_REQUIRE([AC_CANONICAL_TARGET])
   PATH="$prefix/bin:$prefix/usr/bin:$PATH"
   AC_PATH_PROG(SDL_CONFIG, sdl-config, no, [$PATH])
   min_sdl_version=ifelse([$1], ,0.11.0,$1)
@@ -242,7 +248,6 @@ AC_ARG_ENABLE(sdltest, [  --disable-sdltest       Do not try to compile and run 
       ac_save_CFLAGS="$CFLAGS"
       ac_save_LIBS="$LIBS"
       CFLAGS="$CFLAGS $SDL_CFLAGS"
-      CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
       LIBS="$LIBS $SDL_LIBS"
 dnl
 dnl Now check if the installed SDL is sufficiently new. (Also sanity
@@ -362,22 +367,21 @@ int main(int argc, char *argv[])
   AC_SUBST(SDL_LIBS)
   rm -f conf.sdltest
 ])
-
 dnl Configure Paths for Alsa
 dnl Some modifications by Richard Boulton <richard-alsa@tartarus.org>
 dnl Christopher Lansdown <lansdoct@cs.alfred.edu>
 dnl Jaroslav Kysela <perex@suse.cz>
-dnl Last modification: alsa.m4,v 1.22 2002/05/27 11:14:20 tiwai Exp
+dnl Last modification: alsa.m4,v 1.24 2004/09/15 18:48:07 tiwai Exp
 dnl AM_PATH_ALSA([MINIMUM-VERSION [, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl Test for libasound, and define ALSA_CFLAGS and ALSA_LIBS as appropriate.
 dnl enables arguments --with-alsa-prefix=
 dnl                   --with-alsa-enc-prefix=
-dnl                   --disable-alsatest  (this has no effect, as yet)
+dnl                   --disable-alsatest
 dnl
 dnl For backwards compatibility, if ACTION_IF_NOT_FOUND is not specified,
 dnl and the alsa libraries are not found, a fatal AC_MSG_ERROR() will result.
 dnl
-AC_DEFUN(AM_PATH_ALSA,
+AC_DEFUN([AM_PATH_ALSA],
 [dnl Save the original CFLAGS, LDFLAGS, and LIBS
 alsa_save_CFLAGS="$CFLAGS"
 alsa_save_LDFLAGS="$LDFLAGS"
@@ -398,7 +402,7 @@ AC_ARG_WITH(alsa-inc-prefix,
 dnl FIXME: this is not yet implemented
 AC_ARG_ENABLE(alsatest,
 [  --disable-alsatest      Do not try to compile and run a test Alsa program],
-[enable_alsatest=no],
+[enable_alsatest="$enableval"],
 [enable_alsatest=yes])
 
 dnl Add any special include directories
@@ -408,6 +412,7 @@ if test "$alsa_inc_prefix" != "" ; then
 	CFLAGS="$CFLAGS -I$alsa_inc_prefix"
 fi
 AC_MSG_RESULT($ALSA_CFLAGS)
+CFLAGS="$alsa_save_CFLAGS"
 
 dnl add any special lib dirs
 AC_MSG_CHECKING(for ALSA LDFLAGS)
@@ -418,10 +423,6 @@ fi
 
 dnl add the alsa library
 ALSA_LIBS="$ALSA_LIBS -lasound -lm -ldl -lpthread"
-LIBS=`echo $LIBS | sed 's/-lm//'`
-LIBS=`echo $LIBS | sed 's/-ldl//'`
-LIBS=`echo $LIBS | sed 's/-lpthread//'`
-LIBS=`echo $LIBS | sed 's/  //'`
 LIBS="$ALSA_LIBS $LIBS"
 AC_MSG_RESULT($ALSA_LIBS)
 
@@ -481,24 +482,22 @@ exit(0);
 AC_LANG_RESTORE
 
 dnl Now that we know that we have the right version, let's see if we have the library and not just the headers.
+if test "x$enable_alsatest" = "xyes"; then
 AC_CHECK_LIB([asound], [snd_ctl_open],,
 	[ifelse([$3], , [AC_MSG_ERROR(No linkable libasound was found.)])
 	 alsa_found=no]
 )
+fi
+
+LDFLAGS="$alsa_save_LDFLAGS"
+LIBS="$alsa_save_LIBS"
 
 if test "x$alsa_found" = "xyes" ; then
    ifelse([$2], , :, [$2])
-   LIBS=`echo $LIBS | sed 's/-lasound//g'`
-   LIBS=`echo $LIBS | sed 's/  //'`
-   LIBS="-lasound $LIBS"
-fi
-if test "x$alsa_found" = "xno" ; then
-   ifelse([$3], , :, [$3])
-   CFLAGS="$alsa_save_CFLAGS"
-   LDFLAGS="$alsa_save_LDFLAGS"
-   LIBS="$alsa_save_LIBS"
+else
    ALSA_CFLAGS=""
    ALSA_LIBS=""
+   ifelse([$3], , :, [$3])
 fi
 
 dnl That should be it.  Now just export out symbols:
@@ -506,3 +505,115 @@ AC_SUBST(ALSA_CFLAGS)
 AC_SUBST(ALSA_LIBS)
 ])
 
+# ao.m4
+# Configure paths for libao
+# Jack Moffitt <jack@icecast.org> 10-21-2000
+# Shamelessly stolen from Owen Taylor and Manish Singh
+
+dnl XIPH_PATH_AO([ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl Test for libao, and define AO_CFLAGS and AO_LIBS
+dnl
+AC_DEFUN([XIPH_PATH_AO],
+[dnl 
+dnl Get the cflags and libraries
+dnl
+AC_ARG_WITH(ao,[  --with-ao=PFX   Prefix where libao is installed (optional)], ao_prefix="$withval", ao_prefix="")
+AC_ARG_WITH(ao-libraries,[  --with-ao-libraries=DIR   Directory where libao library is installed (optional)], ao_libraries="$withval", ao_libraries="")
+AC_ARG_WITH(ao-includes,[  --with-ao-includes=DIR   Directory where libao header files are installed (optional)], ao_includes="$withval", ao_includes="")
+AC_ARG_ENABLE(aotest, [  --disable-aotest       Do not try to compile and run a test ao program],, enable_aotest=yes)
+
+
+  if test "x$ao_libraries" != "x" ; then
+    AO_LIBS="-L$ao_libraries"
+  elif test "x$ao_prefix" != "x"; then
+    AO_LIBS="-L$ao_prefix/lib"
+  elif test "x$prefix" != "xNONE"; then
+    AO_LIBS="-L$prefix/lib"
+  fi
+
+  if test "x$ao_includes" != "x" ; then
+    AO_CFLAGS="-I$ao_includes"
+  elif test "x$ao_prefix" != "x"; then
+    AO_CFLAGS="-I$ao_prefix/include"
+  elif test "x$prefix" != "xNONE"; then
+    AO_CFLAGS="-I$prefix/include"
+  fi
+
+  # see where dl* and friends live
+  AC_CHECK_FUNCS(dlopen, [AO_DL_LIBS=""], [
+    AC_CHECK_LIB(dl, dlopen, [AO_DL_LIBS="-ldl"], [
+      AC_MSG_WARN([could not find dlopen() needed by libao sound drivers
+      your system may not be supported.])
+    ])
+  ])
+
+  AO_LIBS="$AO_LIBS -lao $AO_DL_LIBS"
+
+  AC_MSG_CHECKING(for ao)
+  no_ao=""
+
+
+  if test "x$enable_aotest" = "xyes" ; then
+    ac_save_CFLAGS="$CFLAGS"
+    ac_save_LIBS="$LIBS"
+    CFLAGS="$CFLAGS $AO_CFLAGS"
+    LIBS="$LIBS $AO_LIBS"
+dnl
+dnl Now check if the installed ao is sufficiently new.
+dnl
+      rm -f conf.aotest
+      AC_TRY_RUN([
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ao/ao.h>
+
+int main ()
+{
+  system("touch conf.aotest");
+  return 0;
+}
+
+],, no_ao=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
+       CFLAGS="$ac_save_CFLAGS"
+       LIBS="$ac_save_LIBS"
+  fi
+
+  if test "x$no_ao" = "x" ; then
+     AC_MSG_RESULT(yes)
+     ifelse([$1], , :, [$1])     
+  else
+     AC_MSG_RESULT(no)
+     if test -f conf.aotest ; then
+       :
+     else
+       echo "*** Could not run ao test program, checking why..."
+       CFLAGS="$CFLAGS $AO_CFLAGS"
+       LIBS="$LIBS $AO_LIBS"
+       AC_TRY_LINK([
+#include <stdio.h>
+#include <ao/ao.h>
+],     [ return 0; ],
+       [ echo "*** The test program compiled, but did not run. This usually means"
+       echo "*** that the run-time linker is not finding ao or finding the wrong"
+       echo "*** version of ao. If it is not finding ao, you'll need to set your"
+       echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
+       echo "*** to the installed location  Also, make sure you have run ldconfig if that"
+       echo "*** is required on your system"
+       echo "***"
+       echo "*** If you have an old version installed, it is best to remove it, although"
+       echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"],
+       [ echo "*** The test program failed to compile or link. See the file config.log for the"
+       echo "*** exact error that occured. This usually means ao was incorrectly installed"
+       echo "*** or that you have moved ao since it was installed." ])
+       CFLAGS="$ac_save_CFLAGS"
+       LIBS="$ac_save_LIBS"
+     fi
+     AO_CFLAGS=""
+     AO_LIBS=""
+     ifelse([$2], , :, [$2])
+  fi
+  AC_SUBST(AO_CFLAGS)
+  AC_SUBST(AO_LIBS)
+  rm -f conf.aotest
+])

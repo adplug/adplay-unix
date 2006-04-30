@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001 - 2003 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2006 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include "config.h"
 
 // Enumerate ALL outputs (regardless of availability)
-enum Outputs {none, null, oss, disk, esound, qsa, sdl, alsa};
+enum Outputs {none, null, ao, oss, disk, esound, qsa, sdl, alsa};
 
 #define DEFAULT_DRIVER none
 
@@ -46,11 +46,25 @@ enum Outputs {none, null, oss, disk, esound, qsa, sdl, alsa};
 #define DEFAULT_DRIVER disk
 #endif
 
+// EsounD driver
+#ifdef DRIVER_ESOUND
+#include "esound.h"
+#undef DEFAULT_DRIVER
+#define DEFAULT_DRIVER esound
+#endif
+
 // SDL driver
 #ifdef DRIVER_SDL
 #include "sdl.h"
 #undef DEFAULT_DRIVER
 #define DEFAULT_DRIVER sdl
+#endif
+
+// AO driver
+#ifdef DRIVER_AO
+#include "ao.h"
+#undef DEFAULT_DRIVER
+#define DEFAULT_DRIVER ao 
 #endif
 
 // OSS driver
@@ -72,13 +86,6 @@ enum Outputs {none, null, oss, disk, esound, qsa, sdl, alsa};
 #include "qsa.h"
 #undef DEFAULT_DRIVER
 #define DEFAULT_DRIVER qsa
-#endif
-
-// EsounD driver
-#ifdef DRIVER_ESOUND
-#include "esound.h"
-#undef DEFAULT_DRIVER
-#define DEFAULT_DRIVER esound
 #endif
 
 #endif

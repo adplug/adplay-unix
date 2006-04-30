@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001 - 2004 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2006 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,10 +30,10 @@
  * Apple (OS X) and Sun systems declare getopt in unistd.h, other systems
  * (Linux) use getopt.h.
  */
-#if defined ( __APPLE__ ) || ( defined (__SVR4) && defined (__sun) )
-#       include <unistd.h>
+#if defined ( __APPLE__ ) || (defined(__SVR4) && defined(__sun))
+#	include <unistd.h>
 #else
-#       include "getopt.h"
+#	include "getopt.h"
 #endif
 
 #include "defines.h"
@@ -164,6 +164,9 @@ static void usage()
 #ifdef DRIVER_SDL
 	 "sdl "
 #endif
+#ifdef DRIVER_AO
+	 "ao "
+#endif
 #ifdef DRIVER_ALSA
 	 "alsa "
 #endif
@@ -232,6 +235,7 @@ static int decode_switches(int argc, char **argv)
 	else if(!strcmp(optarg,"qsa")) cfg.output = qsa;
 	else if(!strcmp(optarg,"alsa")) cfg.output = alsa;
 	else if(!strcmp(optarg,"sdl")) cfg.output = sdl;
+	else if(!strcmp(optarg,"ao")) cfg.output = ao;
 	else {
 	  message(MSG_ERROR, "unknown output method -- %s", optarg);
 	  exit(EXIT_FAILURE);
@@ -388,6 +392,12 @@ int main(int argc, char **argv)
     player = new QSAPlayer(opl, cfg.bits, cfg.channels, cfg.freq);
     break;
 #endif
+#ifdef DRIVER_AO
+  case ao:
+    player = new AOPlayer(opl, cfg.device, cfg.bits, cfg.channels, cfg.freq, cfg.buf_size);
+    break;
+#endif
+#
 #ifdef DRIVER_SDL
   case sdl:
     player = new SDLPlayer(opl, cfg.bits, cfg.channels, cfg.freq, cfg.buf_size);
