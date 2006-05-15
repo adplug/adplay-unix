@@ -23,6 +23,10 @@ I will try to do the old-style library search for which i cannot check \
 versions. Please bear in mind that i am requiring at least version 1.4.])
 AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([*** AdPlug not installed ***]))])
 
+# Check if getopt header is installed on this system
+AC_CHECK_HEADERS([getopt.h], ,
+	AC_SUBST(GETOPT_SOURCES, [getopt.c getopt1.c getopt.h]))
+
 ##### Output mechanism checks #####
 # These checks enable or disable certain output mechanisms,
 # depending on system facilities and user requests.

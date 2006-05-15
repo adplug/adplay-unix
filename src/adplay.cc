@@ -33,7 +33,11 @@
 #if defined (__APPLE__) || (defined(__SVR4) && defined(__sun))
 #	include <unistd.h>
 #else
-#	include "getopt.h"
+#	ifdef HAVE_GETOPT_H
+#		include <getopt.h>
+#	else
+#		include "getopt.h"
+#	endif
 #endif
 
 #include "defines.h"
