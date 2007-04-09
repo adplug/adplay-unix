@@ -1,158 +1,186 @@
-2006-04-23 17:04  dynamite
+2007-04-09 18:21  dynamite
+
+	* README, configure.in: Release candidate.
+
+2006-05-15 06:33  dynamite
+
+	* configure.in, src/Makefile.am, src/adplay.cc: getopt compiled
+	  conditionally now.
+
+2006-04-30 05:02  dynamite
+
+	* src/adplay.cc: Whitespace changes.
+
+2006-04-30 04:02  dynamite
+
+	* AUTHORS, NEWS, adplay.qpg, adplay.spec, doc/adplay.1: Bumped
+	  version number. Updated manpage.
+
+2006-04-30 03:41  dynamite
+
+	* acinclude.m4, configure.in, src/Makefile.am, src/adplay.cc,
+	  src/ao.cc, src/ao.h, src/players.h: Added libao player. EsounD
+	  now least favourable default output, after disk writer.
+
+2006-04-24 02:04  dynamite
+
+	* ChangeLog: Updated.
+
+2006-04-24 02:04  dynamite
 
 	* NEWS, configure.in: Made backwards compatible with AdPlug < 2.0.
 
-2006-02-27 22:14  dynamite
+2006-02-28 07:14  dynamite
 
 	* README, src/Makefile.am: Changed AdPlug's datadir to
 	  $(sharedstatedir).
 
-2005-09-20 12:30  dynamite
+2005-09-20 21:30  dynamite
 
 	* NEWS, configure.in, src/Makefile.am: Made compatible with latest
 	  AdPlug 1.6.
 
-2005-01-02 13:04  dynamite
+2005-01-02 22:04  dynamite
 
 	* NEWS, configure.in, doc/adplay.1: Bumped version number.
 
-2004-10-01 08:18  dynamite
+2004-10-01 17:18  dynamite
 
 	* ChangeLog: Release 1.4
 
-2004-10-01 08:11  dynamite
+2004-10-01 17:11  dynamite
 
 	* src/adplay.cc: Fixed getopt on OS X and SunOS.
 
-2004-10-01 03:44  dynamite
+2004-10-01 12:44  dynamite
 
 	* README, doc/adplay.1, src/adplay.cc, src/alsa.cc: Fixed ALSA
 	  driver. Updated documentation.
 
-2004-05-13 02:57  dynamite
+2004-05-13 11:57  dynamite
 
 	* src/: adplay.cc, alsa.cc, alsa.h, disk.cc, disk.h, esound.cc,
 	  esound.h, oss.cc, oss.h, output.cc, output.h, sdl.cc, sdl.h:
 	  Added multiple emulator support.
 
-2003-05-03 15:35  dynamite
+2003-05-04 00:35  dynamite
 
 	* src/sdl.h: Done something with SDL player. ;)
 
-2003-03-28 02:58  dynamite
+2003-03-28 11:58  dynamite
 
 	* NEWS, TODO, acinclude.m4, configure.in, src/Makefile.am,
 	  src/adplay.cc, src/players.h, src/sdl.cc, src/alsa.cc,
 	  src/alsa.h: Added ALSA output (still buggy).
 
-2003-03-19 03:53  dynamite
+2003-03-19 12:53  dynamite
 
 	* AUTHORS, NEWS, adplay.qpg, adplay.spec, configure.in: Bumped
 	  version number.
 
-2003-03-18 06:28  dynamite
+2003-03-18 15:28  dynamite
 
 	* Makefile.am: Added missing files to archive. RC4.
 
-2003-03-18 06:20  dynamite
+2003-03-18 15:20  dynamite
 
 	* src/Makefile.am: UNIX build fixes. RC3.
 
-2003-03-18 06:09  dynamite
+2003-03-18 15:09  dynamite
 
 	* ChangeLog, adplay_mdk.spec: Removed mandrake spec file. Release
 	  Candidate #2.
 
-2003-03-18 05:45  dynamite
+2003-03-18 14:45  dynamite
 
 	* configure.in: RC1.
 
-2003-03-04 13:46  dynamite
+2003-03-04 22:46  dynamite
 
 	* configure.in: Fixed OSS headers detection. It sometimes detected
 	  OSS headers when there weren't any.
 
-2003-03-04 04:48  dynamite
+2003-03-04 13:48  dynamite
 
 	* adplay.spec: Updated redhat spec file.
 
-2003-03-03 07:45  dynamite
+2003-03-03 16:45  dynamite
 
 	* adplay_mdk.spec: Added Mandrake .spec file.
 
-2003-02-28 03:37  dynamite
+2003-02-28 12:37  dynamite
 
 	* configure.in, doc/adplay.1, src/defines.h, src/disk.cc,
 	  src/oss.cc, src/oss.h, src/output.cc, src/output.h, src/sdl.cc,
 	  src/sdl.h: Refixed the SDL player, fixing my former misfix. ;)
 
-2003-02-24 04:13  dynamite
+2003-02-24 13:13  dynamite
 
 	* src/: adplay.cc, sdl.cc, sdl.h: SDL driver fixes.
 
-2003-02-24 03:21  dynamite
+2003-02-24 12:21  dynamite
 
 	* TODO, adplay.qpg, src/sdl.cc: Added error messages to SDL driver.
 	  QNX package version fix.
 
-2003-02-23 08:12  dynamite
+2003-02-23 17:12  dynamite
 
 	* AUTHORS, NEWS, README, TODO, configure.in, doc/adplay.1: Updated
 	  documentation.
 
-2003-02-23 04:47  dynamite
+2003-02-23 13:47  dynamite
 
 	* README, acinclude.m4, adplay.qpg, configure.in, src/Makefile.am,
 	  src/adplay.cc, src/disk.cc, src/disk.h, src/players.h,
 	  src/qsa.cc, src/qsa.h, src/sdl.cc, src/sdl.h: Added QSA and SDL
 	  output drivers. Added QNX packaging file.
 
-2003-02-21 12:16  dynamite
+2003-02-21 21:16  dynamite
 
 	* src/: adplay.cc, disk.cc: Fixes to the disk writer and GCC 3.2
 	  fixes.
 
-2003-02-19 09:46  dynamite
+2003-02-19 18:46  dynamite
 
 	* src/disk.cc: Disk Writer output changed again to always
 	  little-endian. ;)
 
-2003-02-19 08:09  dynamite
+2003-02-19 17:09  dynamite
 
 	* src/: disk.cc, output.cc: Fixed disk writer. Now uses machine
 	  byte ordering.
 
-2003-02-19 06:37  dynamite
+2003-02-19 15:37  dynamite
 
 	* src/: disk.cc, disk.h: Made diskwrite only output little-endian.
 
-2003-02-19 05:15  dynamite
+2003-02-19 14:15  dynamite
 
 	* src/adplay.cc: Fixed typo.
 
-2003-02-19 02:26  dynamite
+2003-02-19 11:26  dynamite
 
 	* TODO, src/adplay.cc, src/defines.h, src/disk.cc, src/disk.h:
 	  Fixed Disk Writer.
 
-2003-02-17 09:14  dynamite
+2003-02-17 18:14  dynamite
 
 	* TODO, src/.cvsignore, src/Makefile.am, src/adplay.cc,
 	  src/output.cc: Now tries to use a database in user's home
 	  directory first, when available.
 
-2003-01-30 09:15  dynamite
+2003-01-30 18:15  dynamite
 
 	* src/: adplay.cc, config.h, config.h.in, disk.cc, disk.h: Fixes
 	  for new adplug library. AdPlugDB support. Disk writer updates
 	  (not tested yet!).
 
-2002-11-29 08:37  dynamite
+2002-11-29 17:37  dynamite
 
 	* .cvsignore, doc/.cvsignore, src/.cvsignore: Added cvsignore
 	  files.
 
-2002-11-29 08:33  dynamite
+2002-11-29 17:33  dynamite
 
 	* Makefile.am, adplay.1, adplay.cc, config.h.in, configure.in,
 	  defines.h, disk.cc, disk.h, esound.cc, esound.h, getopt.c,
@@ -164,127 +192,127 @@
 	  src/oss.cc, src/oss.h, src/output.cc, src/output.h,
 	  src/players.h: Moved source and docs into subdirectories.
 
-2002-11-28 06:08  dynamite
+2002-11-28 15:08  dynamite
 
 	* AUTHORS, adplay.spec, configure.in: Added Red Hat RPM spec file.
 	  Fixed configure output at end of configure script to correctly
 	  display when an output driver is not being built.
 
-2002-11-25 05:50  dynamite
+2002-11-25 14:50  dynamite
 
 	* TODO, acinclude.m4: Added acinclude.m4, containing EsounD
 	  specific autoconf macros.
 
-2002-11-15 02:45  dynamite
+2002-11-15 11:45  dynamite
 
 	* players.h: Made EsounD the default output, when compiled in.
 
-2002-11-15 02:42  dynamite
+2002-11-15 11:42  dynamite
 
 	* Makefile.am, NEWS, README, TODO, adplay.1, adplay.cc,
 	  config.h.in, configure.in, defines.h, disk.cc, esound.cc,
 	  esound.h, oss.cc, players.h: Added EsounD output driver.
 
-2002-10-09 10:11  dynamite
+2002-10-09 19:11  dynamite
 
 	* Makefile.am, README: AdPlay/UNIX release candidate #1
 
-2002-10-09 10:00  dynamite
+2002-10-09 19:00  dynamite
 
 	* .cvsignore, Makefile.am, NEWS, TODO, adplay.1, adplay.cc,
 	  config.h.in, configure.in, disk.cc, disk.h, output.h, players.h:
 	  AdPlay/UNIX 1.2 release candidate #1
 
-2002-10-08 13:48  dynamite
+2002-10-08 22:48  dynamite
 
 	* .cvsignore, Makefile.am, NEWS, TODO, adplay.1, adplay.cc,
 	  disk.cc, disk.h, null.h, oss.cc, oss.h, output.cc, output.h:
 	  Modularized source tree and sound output.
 
-2002-10-05 09:18  dynamite
+2002-10-05 18:18  dynamite
 
 	* TODO: Added TODO file.
 
-2002-10-04 06:18  dynamite
+2002-10-04 15:18  dynamite
 
 	* .cvsignore, Makefile.am, NEWS, README, acinclude.m4, adplay.cc,
 	  autogen.sh, configure.in, system.h: AdPlay 1.2 updates.
 
-2002-08-11 11:43  dynamite
+2002-08-11 20:43  dynamite
 
 	* .cvsignore: Added INSTALL to .cvsignore.
 
-2002-08-11 11:41  dynamite
+2002-08-11 20:41  dynamite
 
 	* COPYING: Added COPYING file.
 
-2002-08-01 08:05  dynamite
+2002-08-01 17:05  dynamite
 
 	* .cvsignore: added .cvsignore file.
 
-2002-06-20 13:53  dynamite
+2002-06-20 22:53  dynamite
 
 	* adplay.1: no message
 
-2002-03-28 08:25  dynamite
+2002-03-28 17:25  dynamite
 
 	* Makefile.am, NEWS, adplay.cc: no message
 
-2002-03-25 05:57  dynamite
+2002-03-25 14:57  dynamite
 
 	* Makefile.am, adplay.cc, configure.in: b
 
-2002-03-18 06:49  dynamite
+2002-03-18 15:49  dynamite
 
 	* Makefile.am, NEWS, adplay.1: no message
 
-2002-03-16 13:37  dynamite
+2002-03-16 22:37  dynamite
 
 	* adplay.cc: f
 
-2002-03-16 12:31  dynamite
+2002-03-16 21:31  dynamite
 
 	* AUTHORS, ChangeLog, Makefile.am, NEWS, acinclude.m4, adplay.1,
 	  adplay.cc, autogen.sh, configure.in, getopt.c, getopt.h,
 	  getopt1.c, system.h: r
 
-2002-03-16 12:30  dynamite
+2002-03-16 21:30  dynamite
 
 	* COPYING, README: no message
 
-2002-03-16 11:07  dynamite
+2002-03-16 20:07  dynamite
 
 	* adplay.cpp, makefile: no message
 
-2002-03-02 12:20  dynamite
+2002-03-02 21:20  dynamite
 
 	* makefile: G
 
-2002-03-02 09:36  dynamite
+2002-03-02 18:36  dynamite
 
 	* README: G
 
-2002-03-02 06:03  dynamite
+2002-03-02 15:03  dynamite
 
 	* adplay.cpp, makefile: G
 
-2001-10-26 08:07  dynamite
+2001-10-26 17:07  dynamite
 
 	* README, adplay.cpp, makefile: release candidate #1
 
-2001-10-23 12:22  dynamite
+2001-10-23 21:22  dynamite
 
 	* adplay.cpp: synced with latest adplug library.
 
-2001-10-18 09:46  dynamite
+2001-10-18 18:46  dynamite
 
 	* COPYING, README, adplay.cpp, makefile: too many changes to list.
 
-2001-10-09 05:47  dynamite
+2001-10-09 14:47  dynamite
 
 	* adplay.cpp, README, makefile: Initial revision
 
-2001-10-09 05:47  dynamite
+2001-10-09 14:47  dynamite
 
 	* adplay.cpp, README, makefile: initial import.
 
