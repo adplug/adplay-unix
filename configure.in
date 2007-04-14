@@ -27,6 +27,31 @@ AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([*** AdPlug not installed ***]))])
 AC_CHECK_HEADERS([getopt.h], ,
 	AC_SUBST(GETOPT_SOURCES, [getopt.c getopt1.c getopt.h]))
 
+# Check if AdPlug supports the new getsubsong() method
+AC_MSG_CHECKING([whether AdPlug supports the getsubsong() method])
+oldldflags="$LDFLAGS"
+oldcppflags="$CPPFLAGS"
+LDFLAGS="$LDFLAGS $adplug_LIBS"
+CPPFLAGS="$CPPFLAGS $adplug_CFLAGS"
+AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <adplug/player.h>
+
+class Testplayer: public CPlayer
+{
+  public:
+    Testplayer(): CPlayer(NULL) {}
+    bool load(const std::string &f, const CFileProvider &fp) { return false; }
+    bool update() { return false; }
+    float getrefresh() { return 0; }
+    std::string gettype() { return std::string(); }
+    void rewind(int s) {}
+};
+
+Testplayer p;], [p.getsubsong();])],
+   AC_DEFINE(HAVE_ADPLUG_GETSUBSONG,, [Defined if AdPlug supports the getsubsong() method])
+AC_MSG_RESULT([yes]), AC_MSG_RESULT([no]))
+LDFLAGS="$oldldflags"
+CPPFLAGS="$oldcppflags"
+
 ##### Output mechanism checks #####
 # These checks enable or disable certain output mechanisms,
 # depending on system facilities and user requests.

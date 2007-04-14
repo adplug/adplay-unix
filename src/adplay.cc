@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001 - 2006 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2007 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,8 +81,8 @@ static struct {
   EmuType		emutype;
   Outputs		output;
 } cfg = {
-  2048, 44100, 1, 16, MSG_NOTE,
-  0,
+  2048, 44100, 2, 16, MSG_NOTE,
+  -1,
   NULL,
   NULL,
   true, false, false, false,
@@ -260,8 +260,12 @@ static int decode_switches(int argc, char **argv)
   return optind;
 }
 
-static void play(const char *fn, Player *pl, unsigned int subsong)
-/* Start playback of subsong 'subsong' of file 'fn', using player 'player'. */
+static void play(const char *fn, Player *pl, int subsong = -1)
+/*
+ * Start playback of subsong 'subsong' of file 'fn', using player
+ * 'player'. If 'subsong' is not given or -1, start playback of
+ * default subsong of file.
+ */
 {
   unsigned long i;
 
@@ -274,7 +278,12 @@ static void play(const char *fn, Player *pl, unsigned int subsong)
     return;
   }
 
-  pl->p->rewind(subsong);
+  if(subsong != -1)
+    pl->p->rewind(subsong);
+#ifdef HAVE_ADPLUG_GETSUBSONG
+  else
+    subsong = pl->p->getsubsong();
+#endif
 
   fprintf(stderr, "Playing '%s'...\n"
 	  "Type  : %s\n"
