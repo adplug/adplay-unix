@@ -288,10 +288,8 @@ static void play(const char *fn, Player *pl, int subsong = -1)
   fprintf(stderr, "Playing '%s'...\n"
 	  "Type  : %s\n"
 	  "Title : %s\n"
-	  "Author: %s\n"
-	  "Desc  : %s\n\n", fn, pl->p->gettype().c_str(),
-	  pl->p->gettitle().c_str(), pl->p->getauthor().c_str(),
-	  pl->p->getdesc().c_str());
+	  "Author: %s\n\n", fn, pl->p->gettype().c_str(),
+	  pl->p->gettitle().c_str(), pl->p->getauthor().c_str());
 
   if(cfg.showinsts) {		// display instruments
     fprintf(stderr, "Instrument names:\n");
