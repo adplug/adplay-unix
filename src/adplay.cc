@@ -25,6 +25,7 @@
 #include <adplug/adplug.h>
 #include <adplug/emuopl.h>
 #include <adplug/kemuopl.h>
+#include <adplug/surroundopl.h>
 
 /*
  * Apple (OS X) and Sun systems declare getopt in unistd.h, other systems
@@ -73,7 +74,7 @@ static Copl		*opl = 0;
 /***** Configuration (and defaults) *****/
 
 static struct {
-  int			buf_size, freq, channels, bits, message_level;
+  int			buf_size, freq, channels, bits, harmonic, message_level;
   unsigned int		subsong;
   const char		*device;
   char			*userdb;
@@ -81,7 +82,7 @@ static struct {
   EmuType		emutype;
   Outputs		output;
 } cfg = {
-  2048, 44100, 1, 16, MSG_NOTE,
+  2048, 44100, 2, 16, 1, MSG_NOTE,
   -1,
   NULL,
   NULL,
@@ -130,6 +131,7 @@ static void usage()
 	 "  -8, --8bit                 8-bit sample quality\n"
 	 "      --16bit                16-bit sample quality\n"
 	 "  -f, --freq=FREQ            set sample frequency to FREQ\n"
+ 	 "      --surround             stereo/surround stream\n"
 	 "      --stereo               stereo stream\n"
 	 "      --mono                 mono stream\n\n"
 	 "Informative output:\n"
@@ -188,6 +190,7 @@ static int decode_switches(int argc, char **argv)
     {"8bit", no_argument, NULL, '8'},		// 8-bit replay
     {"16bit", no_argument, NULL, '1'},		// 16-bit replay
     {"freq", required_argument, NULL, 'f'},	// set frequency
+    {"surround", no_argument, NULL, '4'},		// stereo/harmonic replay
     {"stereo", no_argument, NULL, '3'},		// stereo replay
     {"mono", no_argument, NULL, '2'},		// mono replay
     {"buffer", required_argument, NULL, 'b'},	// buffer size
@@ -213,8 +216,9 @@ static int decode_switches(int argc, char **argv)
       case '8': cfg.bits = 8; break;
       case '1': cfg.bits = 16; break;
       case 'f': cfg.freq = atoi(optarg); break;
-      case '3': cfg.channels = 2; break;
-      case '2': cfg.channels = 1; break;
+      case '4': cfg.channels = 2; cfg.harmonic = 1; break;
+      case '3': cfg.channels = 2; cfg.harmonic = 0; break;
+      case '2': cfg.channels = 1; cfg.harmonic = 0; break;
       case 'b': cfg.buf_size = atoi(optarg); break;
       case 'd': cfg.device = optarg; break;
       case 'i': cfg.showinsts = true; break;
@@ -366,10 +370,28 @@ int main(int argc, char **argv)
   // init emulator
   switch(cfg.emutype) {
   case Emu_Satoh:
-    opl = new CEmuopl(cfg.freq, cfg.bits == 16, cfg.channels == 2);
+  	if (cfg.harmonic) {
+      Copl *a = new CEmuopl(cfg.freq, cfg.bits == 16, false);
+      Copl *b = new CEmuopl(cfg.freq, cfg.bits == 16, false);
+      opl = new CSurroundopl(a, b, cfg.bits == 16);
+      // CSurroundopl now owns a and b and will free upon destruction
+  	} else {
+      opl = new CEmuopl(cfg.freq, cfg.bits == 16, cfg.channels == 2);
+  	}
     break;
   case Emu_Ken:
-    opl = new CKemuopl(cfg.freq, cfg.bits == 16, cfg.channels == 2);
+  	if (cfg.harmonic) {
+  		fprintf(stderr, "%s: Sorry, Ken's emulator only supports one instance "
+  			"so does not work properly in surround mode.\n", program_name);
+  		// Leave the code though for future use (once Ken's emu is wrapped up
+  		// in a class or something.  It works, it just sounds really bad.)
+      Copl *a = new CKemuopl(cfg.freq, cfg.bits == 16, false);
+      Copl *b = new CKemuopl(cfg.freq, cfg.bits == 16, false);
+      opl = new CSurroundopl(a, b, cfg.bits == 16);
+      // CSurroundopl now owns a and b and will free upon destruction
+  	} else {
+  		opl = new CKemuopl(cfg.freq, cfg.bits == 16, cfg.channels == 2);
+  	}
     break;
   }
 
