@@ -48,6 +48,7 @@ public:
 	    unsigned long nfreq, unsigned long nbufsize);
   virtual ~EmuPlayer();
 
+  virtual void setbufsize(unsigned long nbufsize);
   virtual void frame();
   virtual Copl *get_opl() { return opl; }
 

@@ -20,7 +20,7 @@
 #include "defines.h"
 #include "alsa.h"
 
-#define DEFAULT_DEVICE	"plughw:0,0"	// Default ALSA output device
+#define DEFAULT_DEVICE	"default"	// Default ALSA output device
 
 ALSAPlayer::ALSAPlayer(Copl *nopl, const char *device, unsigned char bits,
 		       int channels, int freq, unsigned long bufsize)
@@ -28,6 +28,7 @@ ALSAPlayer::ALSAPlayer(Copl *nopl, const char *device, unsigned char bits,
 {
   snd_pcm_hw_params_t	*hwparams;
   unsigned int		nfreq = freq;
+  unsigned long nbufsize;
 
   if(!device) device = DEFAULT_DEVICE;
 
@@ -76,15 +77,19 @@ ALSAPlayer::ALSAPlayer(Copl *nopl, const char *device, unsigned char bits,
   }
 
   // Set number of periods
-  if(snd_pcm_hw_params_set_periods(pcm_handle, hwparams, 2, 0) < 0) {
+  if(snd_pcm_hw_params_set_periods(pcm_handle, hwparams, 4, 0) < 0) {
     message(MSG_ERROR, "error setting periods");
     exit(EXIT_FAILURE);
   }
 
-  // Set buffer size (in samples)
+  // Set the preferred buffer size (in samples)
   if(snd_pcm_hw_params_set_buffer_size(pcm_handle, hwparams, bufsize / getsampsize()) < 0) {
-    message(MSG_ERROR, "error setting buffersize");
-    exit(EXIT_FAILURE);
+    if (snd_pcm_hw_params_get_buffer_size(hwparams, &nbufsize) < 0) {
+      message(MSG_ERROR, "error setting and getting buffer size");
+      exit(EXIT_FAILURE);
+  	}
+    setbufsize(nbufsize);
+    message(MSG_NOTE, "couldn't set buffersize to %ld, using default of %ld instead", bufsize, nbufsize);
   }
 
   // Apply HW parameter settings to PCM device and prepare device
