@@ -82,7 +82,13 @@ static struct {
   EmuType		emutype;
   Outputs		output;
 } cfg = {
-  2048, 44100, 2, 16, 1, MSG_NOTE,
+  2048, 44100,
+#ifdef HAVE_ADPLUG_SURROUND
+  2, 16, 1,  // Default to surround if available
+#else
+  1, 16, 0,  // Else default to mono (until stereo w/ single OPL is fixed)
+#endif
+  MSG_NOTE,
   -1,
   NULL,
   NULL,
@@ -371,16 +377,24 @@ int main(int argc, char **argv)
   switch(cfg.emutype) {
   case Emu_Satoh:
   	if (cfg.harmonic) {
+#ifdef HAVE_ADPLUG_SURROUND
       Copl *a = new CEmuopl(cfg.freq, cfg.bits == 16, false);
       Copl *b = new CEmuopl(cfg.freq, cfg.bits == 16, false);
       opl = new CSurroundopl(a, b, cfg.bits == 16);
       // CSurroundopl now owns a and b and will free upon destruction
+#else
+      fprintf(stderr, "Surround requires AdPlug v2.2 or newer.  Use --mono "
+      	"or upgrade and recompile AdPlay.\n");
+      if(userdb) free(userdb);
+      exit(EXIT_FAILURE);
+#endif
   	} else {
       opl = new CEmuopl(cfg.freq, cfg.bits == 16, cfg.channels == 2);
   	}
     break;
   case Emu_Ken:
   	if (cfg.harmonic) {
+#ifdef HAVE_ADPLUG_SURROUND
   		fprintf(stderr, "%s: Sorry, Ken's emulator only supports one instance "
   			"so does not work properly in surround mode.\n", program_name);
   		// Leave the code though for future use (once Ken's emu is wrapped up
@@ -389,6 +403,12 @@ int main(int argc, char **argv)
       Copl *b = new CKemuopl(cfg.freq, cfg.bits == 16, false);
       opl = new CSurroundopl(a, b, cfg.bits == 16);
       // CSurroundopl now owns a and b and will free upon destruction
+#else
+      fprintf(stderr, "Surround requires AdPlug v2.2 or newer.  Use --mono "
+      	"or upgrade and recompile AdPlay.\n");
+      if(userdb) free(userdb);
+      exit(EXIT_FAILURE);
+#endif
   	} else {
   		opl = new CKemuopl(cfg.freq, cfg.bits == 16, cfg.channels == 2);
   	}

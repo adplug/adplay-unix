@@ -1,3 +1,41 @@
+2009-12-27 08:06  malvineous
+
+	* src/adplay.cc: Added --surround option to use the new stereo
+	  harmonic synth, and made this the default (works the same as the
+	  old default mono synth)
+
+2009-12-27 05:53  malvineous
+
+	* src/adplay.cc: Revert previous commit (gah, there's a command
+	  line option to do that already!)
+
+2009-12-27 05:19  malvineous
+
+	* src/adplay.cc: Display song description/remarks as well as title
+	  and author
+
+2009-12-27 02:39  malvineous
+
+	* src/: alsa.cc, output.cc, output.h: Tweaked ALSA code to work
+	  better with certain audio devices
+
+2007-04-16 17:31  dynamite
+
+	* NEWS, src/adplay.cc: Reverted default of stereo playback. On
+	  standard AdPlug, where dual OPL2 is emulated, this produces sound
+	  only on the left speaker, when only single OPL2 features are used
+	  by the player. I don't know if this is how it was with old SB
+	  Pro, but it seems to be. Frankly, it's just annoying.
+
+2007-04-14 20:15  dynamite
+
+	* NEWS, configure.in, doc/adplay.1, src/adplay.cc: Changed default
+	  subsong to default subsong of file.
+
+2007-04-09 18:29  dynamite
+
+	* ChangeLog: Release
+
 2007-04-09 18:21  dynamite
 
 	* README, configure.in: Release candidate.

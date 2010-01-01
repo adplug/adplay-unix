@@ -1,2 +1,4 @@
 AdPlay/UNIX To Do List:
 -----------------------
+ - Remove warning about Ken's synth not working in surround mode once it has
+   been fixed in AdPlug.

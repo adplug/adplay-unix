@@ -1,5 +1,5 @@
 # Tell autoconf we're compiling a C++ program using automake and libtool.
-AC_INIT(adplay,1.6)
+AC_INIT(adplay,1.7)
 AC_CONFIG_SRCDIR(src/adplay.cc)
 AC_CONFIG_FILES(Makefile src/Makefile doc/Makefile)
 AC_CANONICAL_TARGET
@@ -27,12 +27,14 @@ AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([*** AdPlug not installed ***]))])
 AC_CHECK_HEADERS([getopt.h], ,
 	AC_SUBST(GETOPT_SOURCES, [getopt.c getopt1.c getopt.h]))
 
-# Check if AdPlug supports the new getsubsong() method
-AC_MSG_CHECKING([whether AdPlug supports the getsubsong() method])
+# Save compiler flags and set up for compiling test programs
 oldldflags="$LDFLAGS"
 oldcppflags="$CPPFLAGS"
 LDFLAGS="$LDFLAGS $adplug_LIBS"
 CPPFLAGS="$CPPFLAGS $adplug_CFLAGS"
+
+# Check if AdPlug supports the new getsubsong() method
+AC_MSG_CHECKING([whether AdPlug supports the getsubsong() method])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <adplug/player.h>
 
 class Testplayer: public CPlayer
@@ -49,6 +51,14 @@ class Testplayer: public CPlayer
 Testplayer p;], [p.getsubsong();])],
    AC_DEFINE(HAVE_ADPLUG_GETSUBSONG,, [Defined if AdPlug supports the getsubsong() method])
 AC_MSG_RESULT([yes]), AC_MSG_RESULT([no]))
+
+# Check if AdPlug supports the new surround/harmonic synth
+AC_MSG_CHECKING([whether AdPlug supports the surround/harmonic synth])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <adplug/surroundopl.h>], [CSurroundopl *dummy;])],
+   AC_DEFINE(HAVE_ADPLUG_SURROUND,, [Defined if AdPlug supports the surround/harmonic synth])
+AC_MSG_RESULT([yes]), AC_MSG_RESULT([no - AdPlug >= 2.2 required]))
+
+# Restore flags after compiling test programs
 LDFLAGS="$oldldflags"
 CPPFLAGS="$oldcppflags"
 
