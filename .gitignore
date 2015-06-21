@@ -15,3 +15,10 @@ INSTALL
 autom4te.cache
 libtool
 ltmain.sh
+*.o
+stamp-h1
+.deps
+compile
+src/adplay
+src/config.h
+src/config.h.in
