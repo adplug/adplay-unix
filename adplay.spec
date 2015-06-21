@@ -9,7 +9,7 @@ Release: %{release}
 Source0: %{name}-%{version}.tar.bz2
 License: GPL
 Group: Applications/Multimedia
-URL: http://adplug.sourceforge.net
+URL: http://adplug.github.io
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
 BuildRequires: adplug-devel >= 1.4
