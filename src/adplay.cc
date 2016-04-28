@@ -329,6 +329,8 @@ static void shutdown(void)
 {
   if(player) delete player;
   if(opl) delete opl;
+  // Try to properly reposition terminal cursor, if Ctrl+C is used to exit.
+  printf("\nShut down adplay.\n");
 }
 
 static void sighandler(int signal)
