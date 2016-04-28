@@ -1,5 +1,5 @@
 AdPlay/UNIX - UNIX console-based OPL2 audio player
-Copyright (C) 2001 - 2010 Simon Peter <dn.tlp@gmx.net>
+Copyright (C) 2001 - 2015 Simon Peter <dn.tlp@gmx.net>
 
 Description
 -----------
@@ -17,9 +17,9 @@ Library		Version
 -------		-------
 AdPlug		>= 1.4, or >= 2.2 for full feature support
 
-CVS
+git
 ---
-If you checked out from CVS, first run:
+If you checked out from git, first run:
 
 autoreconf --install
 
