@@ -25,6 +25,7 @@
 #include <adplug/adplug.h>
 #include <adplug/emuopl.h>
 #include <adplug/kemuopl.h>
+#include <adplug/wemuopl.h>
 #include <adplug/surroundopl.h>
 
 /*
@@ -62,7 +63,7 @@
 
 /***** Typedefs *****/
 
-typedef enum { Emu_Satoh, Emu_Ken } EmuType;
+typedef enum { Emu_Satoh, Emu_Ken, Emu_Woody } EmuType;
 
 /***** Global variables *****/
 
@@ -93,7 +94,7 @@ static struct {
   NULL,
   NULL,
   true, false, false, false,
-  Emu_Satoh,
+  Emu_Woody,
   DEFAULT_DRIVER
 };
 
@@ -156,7 +157,7 @@ static void usage()
 	 program_name);
 
   // Print list of available output mechanisms
-  printf("Available emulators: satoh ken\n");
+  printf("Available emulators: satoh ken woody\n");
   printf("Available output mechanisms: "
 #ifdef DRIVER_OSS
 	 "oss "
@@ -258,6 +259,7 @@ static int decode_switches(int argc, char **argv)
       case 'e':
 	if(!strcmp(optarg, "satoh")) cfg.emutype = Emu_Satoh;
 	else if(!strcmp(optarg, "ken")) cfg.emutype = Emu_Ken;
+	else if(!strcmp(optarg, "woody")) cfg.emutype = Emu_Woody;
 	else {
 	  message(MSG_ERROR, "unknown emulator -- %s", optarg);
 	  exit(EXIT_FAILURE);
@@ -330,7 +332,7 @@ static void shutdown(void)
   if(player) delete player;
   if(opl) delete opl;
   // Try to properly reposition terminal cursor, if Ctrl+C is used to exit.
-  printf("\nShut down adplay.\n");
+  printf("\n\n");
 }
 
 static void sighandler(int signal)
@@ -413,6 +415,23 @@ int main(int argc, char **argv)
 #endif
   	} else {
   		opl = new CKemuopl(cfg.freq, cfg.bits == 16, cfg.channels == 2);
+  	}
+    break;
+   case Emu_Woody:
+  	if (cfg.harmonic) {
+#ifdef HAVE_ADPLUG_SURROUND
+      Copl *a = new CWemuopl(cfg.freq, cfg.bits == 16, false);
+      Copl *b = new CWemuopl(cfg.freq, cfg.bits == 16, false);
+      opl = new CSurroundopl(a, b, cfg.bits == 16);
+      // CSurroundopl now owns a and b and will free upon destruction
+#else
+      fprintf(stderr, "Surround requires AdPlug v2.2 or newer.  Use --mono "
+      	"or upgrade and recompile AdPlay.\n");
+      if(userdb) free(userdb);
+      exit(EXIT_FAILURE);
+#endif
+  	} else {
+      opl = new CWemuopl(cfg.freq, cfg.bits == 16, cfg.channels == 2);
   	}
     break;
   }
