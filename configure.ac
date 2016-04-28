@@ -149,7 +149,7 @@ fi
 # SDL output
 if test ${enable_output_sdl:=yes} = yes; then
    AC_LANG_PUSH(C)
-   AM_PATH_SDL(1.2.0,
+   EXULT_CHECK_SDL(
 	AC_DEFINE(DRIVER_SDL,1,[Build SDL output])
 	drivers=$drivers' sdl.$(OBJEXT)',
 	enable_output_sdl=no
@@ -186,3 +186,8 @@ echo "QSA output (qsa):         ${enable_output_qsa}"
 echo "SDL output (sdl):         ${enable_output_sdl}"
 echo "ALSA output (alsa):       ${enable_output_alsa}"
 echo "Libao output (ao):        ${enable_output_ao}"
+
+if test "x$exult_sdlok" = xyes; then
+   echo ""
+   echo "SDL version:              `$SDL_CONFIG $sdl_args --version`"
+fi
