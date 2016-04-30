@@ -33,6 +33,24 @@ oldcppflags="$CPPFLAGS"
 LDFLAGS="$LDFLAGS $adplug_LIBS"
 CPPFLAGS="$CPPFLAGS $adplug_CFLAGS"
 
+# Check if AdPlug is installed and linked correctly
+AC_MSG_CHECKING([whether AdPlug is linked correctly])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <adplug/player.h>
+
+class Testplayer: public CPlayer
+{
+  public:
+    Testplayer(): CPlayer(NULL) {}
+    bool load(const std::string &f, const CFileProvider &fp) { return false; }
+    bool update() { return false; }
+    float getrefresh() { return 0; }
+    std::string gettype() { return std::string(); }
+    void rewind(int s) {}
+};
+
+Testplayer p;], [p.getrefresh();])],
+  AC_MSG_RESULT([yes]), AC_MSG_RESULT([no]); AC_MSG_ERROR([Unable to compile a program using AdPlug. Please check to ensure AdPlug is installed correctly.]) )
+
 # Check if AdPlug supports the new getsubsong() method
 AC_MSG_CHECKING([whether AdPlug supports the getsubsong() method])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <adplug/player.h>
