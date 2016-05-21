@@ -90,7 +90,7 @@ static struct {
   1, 16, 0,  // Else default to mono (until stereo w/ single OPL is fixed)
 #endif
   MSG_NOTE,
-  -1,
+  (unsigned int)-1,
   NULL,
   NULL,
   true, false, false, false,
