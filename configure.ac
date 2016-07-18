@@ -28,9 +28,9 @@ AC_CHECK_HEADERS([getopt.h], ,
 	AC_SUBST(GETOPT_SOURCES, [getopt.c getopt1.c getopt.h]))
 
 # Save compiler flags and set up for compiling test programs
-oldldflags="$LDFLAGS"
+oldlibs="$LIBS"
 oldcppflags="$CPPFLAGS"
-LDFLAGS="$LDFLAGS $adplug_LIBS"
+LIBS="$LDFLAGS $adplug_LIBS"
 CPPFLAGS="$CPPFLAGS $adplug_CFLAGS"
 
 # Check if AdPlug is installed and linked correctly
@@ -77,7 +77,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <adplug/surroundopl.h>], [CSurroundopl
 AC_MSG_RESULT([yes]), AC_MSG_RESULT([no - AdPlug >= 2.2 required]))
 
 # Restore flags after compiling test programs
-LDFLAGS="$oldldflags"
+LIBS="$oldlibs"
 CPPFLAGS="$oldcppflags"
 
 ##### Output mechanism checks #####
