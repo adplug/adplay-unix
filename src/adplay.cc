@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
+ * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
 #include <stdlib.h>
@@ -26,6 +26,7 @@
 #include <adplug/emuopl.h>
 #include <adplug/kemuopl.h>
 #include <adplug/wemuopl.h>
+#include <adplug/nemuopl.h>
 #include <adplug/surroundopl.h>
 
 /*
@@ -63,7 +64,7 @@
 
 /***** Typedefs *****/
 
-typedef enum { Emu_Satoh, Emu_Ken, Emu_Woody } EmuType;
+typedef enum { Emu_Satoh, Emu_Ken, Emu_Woody, Emu_Nuked } EmuType;
 
 /***** Global variables *****/
 
@@ -94,7 +95,7 @@ static struct {
   NULL,
   NULL,
   true, false, false, false,
-  Emu_Woody,
+  Emu_Nuked,
   DEFAULT_DRIVER
 };
 
@@ -157,7 +158,7 @@ static void usage()
 	 program_name);
 
   // Print list of available output mechanisms
-  printf("Available emulators: satoh ken woody\n");
+  printf("Available emulators: satoh ken woody nuked\n");
   printf("Available output mechanisms: "
 #ifdef DRIVER_OSS
 	 "oss "
@@ -260,6 +261,7 @@ static int decode_switches(int argc, char **argv)
 	if(!strcmp(optarg, "satoh")) cfg.emutype = Emu_Satoh;
 	else if(!strcmp(optarg, "ken")) cfg.emutype = Emu_Ken;
 	else if(!strcmp(optarg, "woody")) cfg.emutype = Emu_Woody;
+  else if(!strcmp(optarg, "nuked")) cfg.emutype = Emu_Nuked;
 	else {
 	  message(MSG_ERROR, "unknown emulator -- %s", optarg);
 	  exit(EXIT_FAILURE);
@@ -417,7 +419,7 @@ int main(int argc, char **argv)
   		opl = new CKemuopl(cfg.freq, cfg.bits == 16, cfg.channels == 2);
   	}
     break;
-   case Emu_Woody:
+  case Emu_Woody:
   	if (cfg.harmonic) {
 #ifdef HAVE_ADPLUG_SURROUND
       Copl *a = new CWemuopl(cfg.freq, cfg.bits == 16, false);
@@ -433,6 +435,30 @@ int main(int argc, char **argv)
   	} else {
       opl = new CWemuopl(cfg.freq, cfg.bits == 16, cfg.channels == 2);
   	}
+    break;
+  case Emu_Nuked:
+    if (cfg.harmonic) {
+ #ifdef HAVE_ADPLUG_SURROUND
+       fprintf(stderr, "Nuked OPL3 emulator doesn't wroks in Surround mode. "
+         "Use --stereo and --16bit options.\n");
+       if(userdb) free(userdb);
+       exit(EXIT_FAILURE);
+ #else
+       fprintf(stderr, "Surround requires AdPlug v2.2 or newer.  Use --mono "
+          "or upgrade and recompile AdPlay.\n");
+       if(userdb) free(userdb);
+       exit(EXIT_FAILURE);
+ #endif
+    } else {
+       if(cfg.bits != 16 || cfg.channels !=2) {
+         fprintf(stderr, "Sorry, Nuked OPL3 emulator only works in stereo 16 bits. "
+           "Use --stereo and --16bit options.\n");
+         if(userdb) free(userdb);
+         exit(EXIT_FAILURE);
+       } else {
+         opl = new CNemuopl(cfg.freq);
+       }
+    }
     break;
   }
 
