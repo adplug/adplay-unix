@@ -438,7 +438,7 @@ int main(int argc, char **argv)
     break;
   case Emu_Nuked:
   	if (cfg.harmonic) {
-  		fprintf(stderr, "Nuked OPL3 emulator doesn't wroks in Surround mode. "
+  		fprintf(stderr, "Nuked OPL3 emulator doesn't works in Surround mode. "
   			"Use --stereo and --16bit options.\n");
   		if(userdb) free(userdb);
   		exit(EXIT_FAILURE);
