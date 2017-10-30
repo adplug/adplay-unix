@@ -20,20 +20,29 @@
 #ifndef H_NULL
 #define H_NULL
 
-#include <adplug/silentopl.h>
 #include "output.h"
 
 class NullOutput: public Player
 {
 public:
-  virtual void frame()
-    { }
+  NullOutput(Copl *nopl)
+    :opl(nopl)
+  { }
+
+  virtual void frame() {
+    playing = p->update();
+    
+    CDiskopl *dopl = dynamic_cast<CDiskopl *>(opl);
+    if (dopl != NULL) {
+      dopl->update(p);
+    }
+  }
 
   virtual Copl *get_opl()
-    { return &opl; }
+    { return opl; }
 
 private:
-  CSilentopl opl;
+  Copl *opl;
 };
 
 #endif

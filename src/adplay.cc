@@ -27,6 +27,7 @@
 #include <adplug/kemuopl.h>
 #include <adplug/wemuopl.h>
 #include <adplug/nemuopl.h>
+#include <adplug/diskopl.h>
 #include <adplug/surroundopl.h>
 
 /*
@@ -64,7 +65,7 @@
 
 /***** Typedefs *****/
 
-typedef enum { Emu_Satoh, Emu_Ken, Emu_Woody, Emu_Nuked } EmuType;
+typedef enum { Emu_Satoh, Emu_Ken, Emu_Woody, Emu_Nuked, Emu_Rawout } EmuType;
 
 /***** Global variables *****/
 
@@ -158,7 +159,7 @@ static void usage()
 	 program_name);
 
   // Print list of available output mechanisms
-  printf("Available emulators: satoh ken woody nuked\n");
+  printf("Available emulators: satoh ken woody nuked rawout\n");
   printf("Available output mechanisms: "
 #ifdef DRIVER_OSS
 	 "oss "
@@ -262,6 +263,12 @@ static int decode_switches(int argc, char **argv)
 	else if(!strcmp(optarg, "ken")) cfg.emutype = Emu_Ken;
 	else if(!strcmp(optarg, "woody")) cfg.emutype = Emu_Woody;
 	else if(!strcmp(optarg, "nuked")) cfg.emutype = Emu_Nuked;
+  else if(!strcmp(optarg, "rawout")) {
+    cfg.emutype = Emu_Rawout;
+    cfg.output = null;
+    cfg.endless = false;
+  }
+
 	else {
 	  message(MSG_ERROR, "unknown emulator -- %s", optarg);
 	  exit(EXIT_FAILURE);
@@ -453,6 +460,8 @@ int main(int argc, char **argv)
   		}
   	}
   	break;
+  case Emu_Rawout:
+    opl = new CDiskopl(cfg.device);
   }
 
   // init player
@@ -468,7 +477,7 @@ int main(int argc, char **argv)
 #endif
 #ifdef DRIVER_NULL
   case null:
-    player = new NullOutput();
+    player = new NullOutput(opl);
     break;
 #endif
 #ifdef DRIVER_DISK
