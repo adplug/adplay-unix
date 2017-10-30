@@ -26,6 +26,7 @@
 #include <adplug/emuopl.h>
 #include <adplug/kemuopl.h>
 #include <adplug/wemuopl.h>
+#include <adplug/diskopl.h>
 
 /*
  * Sun systems declare getopt in unistd.h,
@@ -79,6 +80,7 @@ typedef enum {
 #ifdef HAVE_ADPLUG_NUKEDOPL
 	Emu_Nuked,
 #endif
+	Emu_Rawout,
 } EmuType;
 
 /***** Global variables *****/
@@ -184,11 +186,11 @@ static void usage()
 	 program_name);
 
   // Print list of available output mechanisms
-  printf("Available emulators: satoh ken woody ");
+  printf("Available emulators: satoh ken woody");
 #ifdef HAVE_ADPLUG_NUKEDOPL
-  printf("nuked");
+  printf(" nuked");
 #endif
-  printf("\n");
+  printf(" rawout\n");
   printf("Available output mechanisms: "
 #ifdef DRIVER_OSS
 	 "oss "
@@ -320,6 +322,12 @@ static int decode_switches(int argc, char **argv)
 #ifdef HAVE_ADPLUG_NUKEDOPL
 	else if(!strcmp(optarg, "nuked")) cfg.emutype = Emu_Nuked;
 #endif
+	else if(!strcmp(optarg, "rawout")) {
+	  cfg.emutype = Emu_Rawout;
+	  cfg.output = null;
+	  cfg.endless = false;
+	}
+
 	else {
 	  message(MSG_ERROR, "unknown emulator -- %s", optarg);
 	  exit(EXIT_FAILURE);
@@ -540,6 +548,8 @@ int main(int argc, char **argv)
   	}
   	break;
 #endif
+  case Emu_Rawout:
+    opl = new CDiskopl(cfg.device);
   }
 
   // init player
@@ -555,7 +565,7 @@ int main(int argc, char **argv)
 #endif
 #ifdef DRIVER_NULL
   case null:
-    player = new NullOutput();
+    player = new NullOutput(opl);
     break;
 #endif
 #ifdef DRIVER_DISK
