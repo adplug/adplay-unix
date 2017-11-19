@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001 - 2007 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2017 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 #include <adplug/emuopl.h>
 #include <adplug/kemuopl.h>
 #include <adplug/wemuopl.h>
-#include <adplug/nemuopl.h>
-#include <adplug/surroundopl.h>
 
 /*
  * Apple (OS X) and Sun systems declare getopt in unistd.h, other systems
@@ -44,6 +42,14 @@
 #endif
 
 #include "defines.h"
+
+#ifdef HAVE_ADPLUG_NUKEDOPL
+#include <adplug/nemuopl.h>
+#endif
+#ifdef HAVE_ADPLUG_SURROUND
+#include <adplug/surroundopl.h>
+#endif
+
 #include "output.h"
 #include "players.h"
 
@@ -64,7 +70,14 @@
 
 /***** Typedefs *****/
 
-typedef enum { Emu_Satoh, Emu_Ken, Emu_Woody, Emu_Nuked } EmuType;
+typedef enum {
+	Emu_Satoh,
+	Emu_Ken,
+	Emu_Woody,
+#ifdef HAVE_ADPLUG_NUKEDOPL
+	Emu_Nuked,
+#endif
+} EmuType;
 
 /***** Global variables *****/
 
@@ -158,7 +171,11 @@ static void usage()
 	 program_name);
 
   // Print list of available output mechanisms
-  printf("Available emulators: satoh ken woody nuked\n");
+  printf("Available emulators: satoh ken woody ");
+#ifdef HAVE_ADPLUG_NUKEDOPL
+  printf("nuked");
+#endif
+  printf("\n");
   printf("Available output mechanisms: "
 #ifdef DRIVER_OSS
 	 "oss "
@@ -261,7 +278,9 @@ static int decode_switches(int argc, char **argv)
 	if(!strcmp(optarg, "satoh")) cfg.emutype = Emu_Satoh;
 	else if(!strcmp(optarg, "ken")) cfg.emutype = Emu_Ken;
 	else if(!strcmp(optarg, "woody")) cfg.emutype = Emu_Woody;
+#ifdef HAVE_ADPLUG_NUKEDOPL
 	else if(!strcmp(optarg, "nuked")) cfg.emutype = Emu_Nuked;
+#endif
 	else {
 	  message(MSG_ERROR, "unknown emulator -- %s", optarg);
 	  exit(EXIT_FAILURE);
@@ -436,6 +455,7 @@ int main(int argc, char **argv)
       opl = new CWemuopl(cfg.freq, cfg.bits == 16, cfg.channels == 2);
   	}
     break;
+#ifdef HAVE_ADPLUG_NUKEDOPL
   case Emu_Nuked:
   	if (cfg.harmonic) {
   		fprintf(stderr, "Nuked OPL3 emulator doesn't work in surround mode. "
@@ -453,6 +473,7 @@ int main(int argc, char **argv)
   		}
   	}
   	break;
+#endif
   }
 
   // init player

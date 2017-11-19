@@ -76,6 +76,12 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <adplug/surroundopl.h>], [CSurroundopl
    AC_DEFINE(HAVE_ADPLUG_SURROUND,, [Defined if AdPlug supports the surround/harmonic synth])
 AC_MSG_RESULT([yes]), AC_MSG_RESULT([no - AdPlug >= 2.2 required]))
 
+# Check if AdPlug supports NukedOPL
+AC_MSG_CHECKING([whether AdPlug supports the NukedOPL synth])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <adplug/nemuopl.h>], [CNemuopl *dummy;])],
+   AC_DEFINE(HAVE_ADPLUG_NUKEDOPL,, [Defined if AdPlug supports the NukedOPL synth])
+AC_MSG_RESULT([yes]), AC_MSG_RESULT([no - AdPlug >= 2.3 required]))
+
 # Restore flags after compiling test programs
 LIBS="$oldlibs"
 CPPFLAGS="$oldcppflags"
