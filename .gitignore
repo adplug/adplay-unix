@@ -20,5 +20,5 @@ stamp-h1
 .deps
 compile
 src/adplay
-src/config.h
-src/config.h.in
+src/config.h*
+src/.libs/
