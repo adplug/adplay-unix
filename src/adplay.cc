@@ -38,6 +38,8 @@
 #		include <getopt.h>
 #	else
 #		include "getopt.h"
+// ALSA now includes the system-wide getopt under Linux, so stop this
+#   define _GETOPT_POSIX_H 1
 #	endif
 #endif
 
