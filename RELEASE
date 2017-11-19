@@ -1,0 +1,19 @@
+Release procedure
+-----------------
+
+Before release:
+
+ * Ensure version numbers are correct in configure.ac, adplay.qpg, doc/adplay.1.
+   They should already be set to the version number of the next release, but
+   may need altering e.g. if an unplanned bugfix release is made.
+
+ * Update file list in adplug.qpg
+
+ * Update NEWS with changes since last release
+
+ * Create new tag: `git tag v1.2.3` and `git push v1.2.3 origin/master`
+
+After release:
+
+ * Update version numbers as above to match the "next" release.  This means the
+   git code will always compile as the version number of the next release.

@@ -1,5 +1,11 @@
 This is a brief overview of user-visible changes in adplay.
 
+Changes for version 1.8:
+------------------------
+- Tie in with AdPlug 2.3 release
+- Support for NukedOPL emulator
+- Various bug fixes
+
 Changes for version 1.7:
 ------------------------
 - Changed default subsong to default subsong of file.
