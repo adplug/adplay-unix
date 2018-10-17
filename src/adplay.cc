@@ -405,10 +405,13 @@ int main(int argc, char **argv)
   case Emu_Satoh:
   	if (cfg.harmonic) {
 #ifdef HAVE_ADPLUG_SURROUND
-      Copl *a = new CEmuopl(cfg.freq, cfg.bits == 16, false);
-      Copl *b = new CEmuopl(cfg.freq, cfg.bits == 16, false);
-      opl = new CSurroundopl(a, b, cfg.bits == 16);
-      // CSurroundopl now owns a and b and will free upon destruction
+      COPLprops a, b;
+      a.use16bit = b.use16bit = cfg.bits == 16;
+      a.stereo = b.stereo = false;
+      a.opl = new CEmuopl(cfg.freq, a.use16bit, a.stereo);
+      b.opl = new CEmuopl(cfg.freq, b.use16bit, b.stereo);
+      opl = new CSurroundopl(&a, &b, cfg.bits == 16);
+      // CSurroundopl now owns a.opl and b.opl and will free upon destruction
 #else
       fprintf(stderr, "Surround requires AdPlug v2.2 or newer.  Use --mono "
       	"or upgrade and recompile AdPlay.\n");
@@ -426,9 +429,12 @@ int main(int argc, char **argv)
   			"so does not work properly in surround mode.\n", program_name);
   		// Leave the code though for future use (once Ken's emu is wrapped up
   		// in a class or something.  It works, it just sounds really bad.)
-      Copl *a = new CKemuopl(cfg.freq, cfg.bits == 16, false);
-      Copl *b = new CKemuopl(cfg.freq, cfg.bits == 16, false);
-      opl = new CSurroundopl(a, b, cfg.bits == 16);
+      COPLprops a, b;
+      a.use16bit = b.use16bit = cfg.bits == 16;
+      a.stereo = b.stereo = false;
+      a.opl = new CKemuopl(cfg.freq, a.use16bit, a.stereo);
+      b.opl = new CKemuopl(cfg.freq, b.use16bit, b.stereo);
+      opl = new CSurroundopl(&a, &b, cfg.bits == 16);
       // CSurroundopl now owns a and b and will free upon destruction
 #else
       fprintf(stderr, "Surround requires AdPlug v2.2 or newer.  Use --mono "
@@ -443,9 +449,12 @@ int main(int argc, char **argv)
    case Emu_Woody:
   	if (cfg.harmonic) {
 #ifdef HAVE_ADPLUG_SURROUND
-      Copl *a = new CWemuopl(cfg.freq, cfg.bits == 16, false);
-      Copl *b = new CWemuopl(cfg.freq, cfg.bits == 16, false);
-      opl = new CSurroundopl(a, b, cfg.bits == 16);
+      COPLprops a, b;
+      a.use16bit = b.use16bit = cfg.bits == 16;
+      a.stereo = b.stereo = false;
+      a.opl = new CWemuopl(cfg.freq, a.use16bit, a.stereo);
+      b.opl = new CWemuopl(cfg.freq, b.use16bit, b.stereo);
+      opl = new CSurroundopl(&a, &b, cfg.bits == 16);
       // CSurroundopl now owns a and b and will free upon destruction
 #else
       fprintf(stderr, "Surround requires AdPlug v2.2 or newer.  Use --mono "
@@ -459,11 +468,14 @@ int main(int argc, char **argv)
     break;
 #ifdef HAVE_ADPLUG_NUKEDOPL
   case Emu_Nuked:
-  	if (cfg.harmonic) {
-  		fprintf(stderr, "Nuked OPL3 emulator doesn't work in surround mode. "
-  			"Use --stereo and --16bit options.\n");
-  		if(userdb) free(userdb);
-  		exit(EXIT_FAILURE);
+    if (cfg.harmonic) {
+      COPLprops a, b;
+      a.use16bit = b.use16bit = true; // Nuked only supports 16-bit
+      a.stereo = b.stereo = true; // Nuked only supports stereo
+      a.opl = new CNemuopl(cfg.freq);
+      b.opl = new CNemuopl(cfg.freq);
+      opl = new CSurroundopl(&a, &b, cfg.bits == 16); // SurroundOPL can convert to 8-bit though
+      // CSurroundopl now owns a and b and will free upon destruction
   	} else {
   		if(cfg.bits != 16 || cfg.channels != 2) {
   			fprintf(stderr, "Sorry, Nuked OPL3 emulator only works in stereo 16 bits. "
