@@ -1,5 +1,5 @@
 # Tell autoconf we're compiling a C++ program using automake and libtool.
-AC_INIT(adplay,1.8.1)
+AC_INIT(adplay,1.9)
 AC_CONFIG_SRCDIR(src/adplay.cc)
 AC_CONFIG_FILES(Makefile src/Makefile doc/Makefile)
 AC_CANONICAL_TARGET
