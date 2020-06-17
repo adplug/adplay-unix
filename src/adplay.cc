@@ -306,6 +306,7 @@ static void play(const char *fn, Player *pl, int subsong = -1)
 
   // initialize output & player
   pl->get_opl()->init();
+  delete pl->p;
   pl->p = CAdPlug::factory(fn,pl->get_opl());
 
   if(!pl->p) {
