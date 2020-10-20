@@ -83,7 +83,7 @@ ALSAPlayer::ALSAPlayer(Copl *nopl, const char *device, unsigned char bits,
   }
 
   // Set the preferred buffer size (in samples)
-  if(snd_pcm_hw_params_set_buffer_size(pcm_handle, hwparams, bufsize / getsampsize()) < 0) {
+  if(snd_pcm_hw_params_set_buffer_size(pcm_handle, hwparams, 4*bufsize / getsampsize()) < 0) {
     if (snd_pcm_hw_params_get_buffer_size(hwparams, &nbufsize) < 0) {
       message(MSG_ERROR, "error setting and getting buffer size");
       exit(EXIT_FAILURE);
