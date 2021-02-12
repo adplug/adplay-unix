@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
+ * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
 #include <stdlib.h>
@@ -92,7 +92,7 @@ static Copl		*opl = 0;
 
 static struct {
   int			buf_size, freq, channels, bits, harmonic, message_level;
-  unsigned int		subsong;
+  unsigned int		subsong, loops;
   const char		*device;
   char			*userdb;
   bool			endless, showinsts, songinfo, songmessage;
@@ -106,7 +106,7 @@ static struct {
   1, 16, 0,  // Else default to mono (until stereo w/ single OPL is fixed)
 #endif
   MSG_NOTE,
-  (unsigned int)-1,
+  (unsigned int)-1, 1,
   NULL,
   NULL,
   true, false, false, false,
@@ -163,7 +163,8 @@ static void usage()
 	 "  -m, --message              display song message\n\n"
 	 "Playback:\n"
 	 "  -s, --subsong=N            play subsong number N\n"
-	 "  -o, --once                 play only once, don't loop\n\n"
+	 "  -o, --once                 play only once, don't loop\n"
+	 "  -l, --loop=N               loop exactly N times\n\n"
 	 "Generic:\n"
 	 "  -D, --database=FILE        additionally use database file FILE\n"
 	 "  -q, --quiet                be more quiet\n"
@@ -227,6 +228,7 @@ static int decode_switches(int argc, char **argv)
     {"message", no_argument, NULL, 'm'},	// song message
     {"subsong", no_argument, NULL, 's'},	// play subsong
     {"once", no_argument, NULL, 'o'},		// don't loop
+    {"loop", required_argument, NULL, 'l'},	// loop count
     {"help", no_argument, NULL, 'h'},		// display help
     {"version", no_argument, NULL, 'V'},	// version information
     {"emulator", required_argument, NULL, 'e'},	// emulator to use
@@ -237,7 +239,7 @@ static int decode_switches(int argc, char **argv)
     {NULL, 0, NULL, 0}				// end of options
   };
 
-  while ((c = getopt_long(argc, argv, "8f:b:d:irms:ohVe:O:D:qv",
+  while ((c = getopt_long(argc, argv, "8f:b:d:irms:ol:hVe:O:D:qv",
 			  long_options, (int *)0)) != EOF) {
       switch (c) {
       case '8': cfg.bits = 8; break;
@@ -253,6 +255,7 @@ static int decode_switches(int argc, char **argv)
       case 'm': cfg.songmessage = true; break;
       case 's': cfg.subsong = atoi(optarg); break;
       case 'o': cfg.endless = false; break;
+      case 'l': cfg.endless = false; cfg.loops = atoi(optarg); break;
       case 'V': puts(ADPLAY_VERSION); exit(EXIT_SUCCESS);
       case 'h':	usage(); exit(EXIT_SUCCESS); break;
       case 'D':
@@ -291,6 +294,7 @@ static int decode_switches(int argc, char **argv)
       case 'v': cfg.message_level++; break;
       }
   }
+  if (!cfg.loops) cfg.loops = 1;
 
   return optind;
 }
@@ -303,6 +307,9 @@ static void play(const char *fn, Player *pl, int subsong = -1)
  */
 {
   unsigned long i;
+  unsigned long s = 0;
+  unsigned long ls = 0;
+  unsigned int loops = 0;
 
   // initialize output & player
   pl->get_opl()->init();
@@ -347,7 +354,16 @@ static void play(const char *fn, Player *pl, int subsong = -1)
 	      pl->p->getrow(), pl->p->getspeed(), pl->p->getrefresh());
 
     pl->frame();
-  } while(pl->playing || cfg.endless);
+    ++s;
+
+    if (!pl->playing) {
+      if (!ls) ls = s;
+      if (s == ls) {
+        ++loops;
+        s = 0;
+      }
+    }
+  } while(cfg.endless || loops < cfg.loops);
 }
 
 static void shutdown(void)
