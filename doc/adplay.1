@@ -149,8 +149,14 @@ Play subsong number N, instead of the default subsong of the
 file. Only useful for file formats that support multiple subsongs.
 .TP
 .B -o --once
-Play just once, don't loop. This will exit \fBadplay\fP after the song
+Don't loop endlessly. This will exit \fBadplay\fP after the song
 ended. This is the default when multiple \fBFILEs\fP are given.
+.TP
+.B -l --loop=N
+Loop N times then stop. Due to technical limitations of the adplug library,
+a "loop" is considered to be the time between the start of playback and when
+looping first occurs. Accordingly, playback may actually halt at an unexpected
+point, especially when combined with \fB-s\fR. This implies \fB-o\fR.
 .SS "Miscellaneous:"
 .TP
 .B -D, --database=FILE
