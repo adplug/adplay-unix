@@ -75,7 +75,7 @@ void SDLPlayer::callback(void *userdata, Uint8 *audiobuf, int len)
       minicnt += self->spec.freq;
       self->playing = self->p->update();
     }
-    i = min(towrite, (long)(minicnt / self->p->getrefresh() + 4) & ~3);
+    i = MIN(towrite, (long)(minicnt / self->p->getrefresh() + 4) & ~3);
     self->opl->update((short *)pos, i);
     pos += i * self->getsampsize(); towrite -= i;
     minicnt -= (long)(self->p->getrefresh() * i);

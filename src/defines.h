@@ -34,11 +34,11 @@
 #define MSG_NOTE	3
 #define MSG_DEBUG	4
 
-#ifndef min
-#  define min(a,b) (((a) < (b)) ? (a) : (b))
+#ifndef MIN
+#  define MIN(a,b) (((a) < (b)) ? (a) : (b))
 #endif
-#ifndef max
-#  define max(a,b) (((a) > (b)) ? (a) : (b))
+#ifndef MAX
+#  define MAX(a,b) (((a) > (b)) ? (a) : (b))
 #endif
 
 /***** Global functions *****/

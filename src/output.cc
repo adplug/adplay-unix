@@ -70,11 +70,11 @@ void EmuPlayer::frame()
       minicnt += freq;
       playing = p->update();
     }
-    i = min(towrite, (long)(minicnt / p->getrefresh() + 4) & ~3);
+    i = MIN(towrite, (long)(minicnt / p->getrefresh() + 4) & ~3);
     opl->update((short *)pos, i);
     pos += i * getsampsize(); towrite -= i;
     i = (long)(p->getrefresh() * i);
-    minicnt -= max(1, i);
+    minicnt -= MAX(1, i);
   }
 
   // call output driver
