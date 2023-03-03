@@ -1,11 +1,11 @@
 # Tell autoconf we're compiling a C++ program using automake and libtool.
-AC_INIT(adplay,1.9)
+AC_INIT([adplay],[1.9])
 AC_CONFIG_SRCDIR(src/adplay.cc)
 AC_CONFIG_FILES(Makefile src/Makefile doc/Makefile)
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
-AM_CONFIG_HEADER(src/config.h)
-AM_PROG_LIBTOOL
+AC_CONFIG_HEADERS([src/config.h])
+LT_INIT
 AC_LANG(C++)
 
 # Check if we got a sane C/C++ compilation environment.
@@ -91,23 +91,23 @@ CPPFLAGS="$oldcppflags"
 # depending on system facilities and user requests.
 
 # Define user option arguments
-AC_ARG_ENABLE([output-oss],AC_HELP_STRING([--disable-output-oss],[Disable OSS output]))
-AC_ARG_ENABLE([output-null],AC_HELP_STRING([--disable-output-null],[Disable null output]))
-AC_ARG_ENABLE([output-disk],AC_HELP_STRING([--disable-output-disk],[Disable disk writer]))
-AC_ARG_ENABLE([output-esound],AC_HELP_STRING([--disable-output-esound],[Disable EsounD output]))
-AC_ARG_ENABLE([output-qsa],AC_HELP_STRING([--disable-output-qsa],[Disable QSA output]))
-AC_ARG_ENABLE([output-sdl],AC_HELP_STRING([--disable-output-sdl],[Disable SDL output]))
-AC_ARG_ENABLE([output-alsa],AC_HELP_STRING([--disable-output-alsa],[Disable ALSA output]))
-AC_ARG_ENABLE([output-ao],AC_HELP_STRING([--disable-output-ao],[Disable AO output]))
+AC_ARG_ENABLE([output-oss],AS_HELP_STRING([--disable-output-oss],[Disable OSS output]))
+AC_ARG_ENABLE([output-null],AS_HELP_STRING([--disable-output-null],[Disable null output]))
+AC_ARG_ENABLE([output-disk],AS_HELP_STRING([--disable-output-disk],[Disable disk writer]))
+AC_ARG_ENABLE([output-esound],AS_HELP_STRING([--disable-output-esound],[Disable EsounD output]))
+AC_ARG_ENABLE([output-qsa],AS_HELP_STRING([--disable-output-qsa],[Disable QSA output]))
+AC_ARG_ENABLE([output-sdl],AS_HELP_STRING([--disable-output-sdl],[Disable SDL output]))
+AC_ARG_ENABLE([output-alsa],AS_HELP_STRING([--disable-output-alsa],[Disable ALSA output]))
+AC_ARG_ENABLE([output-ao],AS_HELP_STRING([--disable-output-ao],[Disable AO output]))
 # Check if we can compile the enabled drivers:
 # OSS driver
 if test ${enable_output_oss:=yes} = yes; then
    AC_MSG_CHECKING([for OSS headers])
-   AC_TRY_CPP([
+   AC_PREPROC_IFELSE([AC_LANG_SOURCE([[
                 #include <fcntl.h>
                 #include <sys/ioctl.h>
        		#include <sys/soundcard.h>
-              ],[
+              ]])],[
                	AC_DEFINE(DRIVER_OSS,1,[Build OSS driver])
                	drivers=$drivers' oss.$(OBJEXT)'
                	AC_MSG_RESULT([found])
@@ -148,14 +148,14 @@ fi
 # QSA driver
 if test ${enable_output_qsa:=yes} = yes; then
    AC_MSG_CHECKING([for QSA headers])
-   AC_TRY_COMPILE([
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
                   #include <sys/asoundlib.h>
                   #include <sys/neutrino.h>
-                  ],[
+                  ]], [[
                   int arg=snd_pcm_open_preferred(NULL, NULL, NULL, 0);
-                  ],[
+                  ]])],[
                   have_qsa=yes
-                  ])
+                  ],[])
     if test x$have_qsa = xyes; then
 	AC_DEFINE(DRIVER_QSA,1,[Build QSA driver])
 	drivers=$drivers' qsa.$(OBJEXT)'
