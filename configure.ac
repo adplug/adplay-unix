@@ -196,6 +196,9 @@ if test ${enable_output_sdl:=yes} = yes; then
      )
      AC_LANG_POP(C)
    fi
+  dnl strip away options that would turn our application from console to a windows GUI application
+  SDL_CFLAGS=`echo $SDL_CFLAGS |sed 's/-Dmain=SDL_main//g'`
+  SDL_LIBS=`echo $SDL_LIBS | sed 's/-mwindows/-mconsole/g' 's/-lSDLmain//g' 's/-lSDL2main//g'`
 fi
 
 # ALSA output

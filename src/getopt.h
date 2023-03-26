@@ -27,6 +27,10 @@
 extern "C" {
 #endif
 
+// in mingw, __argc and __argv are special
+#undef __argc
+#undef __argv
+
 /* For communication from `getopt' to the caller.
    When `getopt' finds an option that takes an argument,
    the argument value is returned here.
