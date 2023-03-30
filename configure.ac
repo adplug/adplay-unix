@@ -4,6 +4,7 @@ AC_CONFIG_SRCDIR(src/adplay.cc)
 AC_CONFIG_FILES(Makefile src/Makefile doc/Makefile)
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
+AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_HEADERS([src/config.h])
 LT_INIT
 AC_LANG(C++)
