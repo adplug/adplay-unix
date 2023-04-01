@@ -174,12 +174,28 @@ fi
 # SDL output
 if test ${enable_output_sdl:=yes} = yes; then
    AC_LANG_PUSH(C)
-   EXULT_CHECK_SDL(
-	AC_DEFINE(DRIVER_SDL,1,[Build SDL output])
-	drivers=$drivers' sdl.$(OBJEXT)',
-	enable_output_sdl=no
-	AC_MSG_RESULT([*** SDL (libsdl) >= 1.2.0 not installed ***]))
+   AM_PATH_SDL2(["2.0.0"],
+       AC_DEFINE(HAVE_SDL_H, 1, [Define to 1 if you have the "SDL.h" header file])
+       AC_DEFINE(DRIVER_SDL, 1, [Build SDL2 output])
+       drivers=$drivers' sdl.$(OBJEXT)',
+       try_sdl12=yes
+       AC_MSG_RESULT([*** SDL libsdl2 >= 2.0.0 not installed ***])
+   )
    AC_LANG_POP(C)
+
+   dnl we can not put AM_PATH_SDL directly into the ACTION-IF-NOT-FOUND of AM_PATH_SDL2
+   dnl due to some m4 macro recursion causing a bad ./configure script to be generated
+   if test ${try_sdl12:=no} = yes; then
+     AC_LANG_PUSH(C)
+     AM_PATH_SDL(["1.2.0"],
+         AC_DEFINE(HAVE_SDL_H, 1, [Define to 1 if you have the "SDL.h" header file])
+         AC_DEFINE(DRIVER_SDL, 1, [Build SDL1.x output])
+         drivers=$drivers' sdl.$(OBJEXT)',
+         enable_output_sdl=no
+         AC_MSG_RESULT([*** SDL libsdl >= 1.2.0 not installed ***])
+     )
+     AC_LANG_POP(C)
+   fi
 fi
 
 # ALSA output
@@ -211,8 +227,3 @@ echo "QSA output (qsa):         ${enable_output_qsa}"
 echo "SDL output (sdl):         ${enable_output_sdl}"
 echo "ALSA output (alsa):       ${enable_output_alsa}"
 echo "Libao output (ao):        ${enable_output_ao}"
-
-if test "x$exult_sdlok" = xyes; then
-   echo ""
-   echo "SDL version:              `$SDL_CONFIG $sdl_args --version`"
-fi
