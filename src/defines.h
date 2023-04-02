@@ -20,8 +20,6 @@
 #ifndef H_DEFINES
 #define H_DEFINES
 
-#include "config.h"
-
 /***** Defines *****/
 
 // AdPlay/UNIX version string
