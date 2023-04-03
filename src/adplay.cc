@@ -442,10 +442,11 @@ int main(int argc, char **argv)
   case Emu_Ken:
   	if (cfg.harmonic) {
 #ifdef HAVE_ADPLUG_SURROUND
-  		fprintf(stderr, "%s: Sorry, Ken's emulator only supports one instance "
-  			"so does not work properly in surround mode.\n", program_name);
-  		// Leave the code though for future use (once Ken's emu is wrapped up
-  		// in a class or something.  It works, it just sounds really bad.)
+#ifndef CKEMUOPL_MULTIINSTANCE
+	  fprintf(stderr, "%s: Sorry, Ken's emulator only supports one instance "
+	    "so does not work properly in surround mode in old versions of "
+	    "the adplug library.\n", program_name);
+#endif
       COPLprops a, b;
       a.use16bit = b.use16bit = cfg.bits == 16;
       a.stereo = b.stereo = false;
