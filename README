@@ -24,7 +24,15 @@ If you checked out from git, first run:
 autoreconf --install
 
 to generate the build cruft and get the configure script. You need recent
-versions of autoconf, automake and libtool to do this.
+versions of autoconf, automake and libtool to do this. If autoreconf fails
+for any reason or you are hacking on the build system, you can run each step
+manually instead of using autoreconf:
+
+libtoolize -c -f --install
+aclocal -I m4
+autoheader
+automake -a -c
+autoconf
 
 Usage
 -----
