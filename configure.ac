@@ -1,20 +1,23 @@
 # Tell autoconf we're compiling a C++ program using automake and libtool.
 AC_INIT([adplay],[1.9])
 AC_CONFIG_SRCDIR(src/adplay.cc)
-AC_CONFIG_FILES(Makefile src/Makefile doc/Makefile)
+AC_CONFIG_FILES(Makefile gnulib/Makefile src/Makefile doc/Makefile)
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
-AC_CONFIG_MACRO_DIRS([m4])
+AC_CONFIG_MACRO_DIRS([m4 m4/gnulib])
 AC_CONFIG_HEADERS([src/config.h])
-LT_INIT
-AC_LANG(C++)
 
 # Check if we got a sane C/C++ compilation environment.
 AC_PROG_INSTALL
 AC_PROG_CC
+gl_EARLY
 AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_CXXCPP
+
+LT_INIT
+
+AC_LANG(C++)
 
 # Nothing works without these libraries...
 AC_CHECK_LIB(stdc++,main,,AC_MSG_ERROR([libstdc++ not installed]))
@@ -23,10 +26,6 @@ AC_MSG_WARN([You seem to be using a version of AdPlug prior to 2.0. \
 I will try to do the old-style library search for which i cannot check \
 versions. Please bear in mind that i am requiring at least version 1.4.])
 AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([*** AdPlug not installed ***]))])
-
-# Check if getopt header is installed on this system
-AC_CHECK_HEADERS([getopt.h], ,
-	AC_SUBST(GETOPT_SOURCES, [getopt.c getopt1.c getopt.h]))
 
 # Save compiler flags and set up for compiling test programs
 oldlibs="$LIBS"
@@ -210,6 +209,8 @@ fi
 
 
 AC_SUBST([drivers])
+
+gl_INIT
 
 AC_OUTPUT
 

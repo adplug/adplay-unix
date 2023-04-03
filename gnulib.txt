@@ -1,0 +1,16 @@
+gnulib is a tool and library that can provide implementation of functionality not available on all operating systems and libc implementations.
+
+Adplug currently uses gnulib to provide getopt_long().
+
+To refresh to the latest version, do the following steps.
+
+* Remove the old instance 
+* clone the gnulib repository outside of the Adplug source tree (In this example it is done in the parent directory)
+* Reimport gnulib
+
+rm -Rf m4/gnulib gnulib
+pushd .
+cd ..
+git clone https://git.savannah.gnu.org/git/gnulib.git
+popd
+../gnulib/gnulib-tool --m4-base m4/gnulib/ --source-base gnulib --no-vc-files --import getopt-gnu

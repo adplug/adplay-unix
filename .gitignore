@@ -27,3 +27,7 @@ m4/lt~obsolete.m4
 src/adplay
 src/config.h*
 src/.libs/
+gnulib/*.a
+gnulib/stddef.h
+gnulib/sys/
+gnulib/unistd.h
