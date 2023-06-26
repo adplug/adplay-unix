@@ -138,18 +138,28 @@ static void usage()
 	 "Output selection:\n"
 	 "  -e, --emulator=EMULATOR    specify emulator to use\n"
 	 "  -O, --output=OUTPUT        specify output mechanism\n\n"
+#ifdef DRIVER_OSS
 	 "OSS driver (oss) specific:\n"
 	 "  -d, --device=FILE          set sound device file to FILE\n"
 	 "  -b, --buffer=SIZE          set output buffer size to SIZE\n\n"
+#endif
+#ifdef DRIVER_DISK
 	 "Disk writer (disk) specific:\n"
 	 "  -d, --device=FILE          output to FILE ('-' is stdout)\n\n"
+#endif
+#ifdef DRIVER_ESOUND
 	 "EsounD driver (esound) specific:\n"
 	 "  -d, --device=URL           URL to EsounD server host (hostname:port)\n\n"
+#endif
+#ifdef DRIVER_SDL
 	 "SDL driver (sdl) specific:\n"
 	 "  -b, --buffer=SIZE          set output buffer size to SIZE\n\n"
+#endif
+#ifdef DRIVER_ALSA
 	 "ALSA driver (alsa) specific:\n"
 	 "  -d, --device=DEVICE        set sound device to DEVICE\n"
 	 "  -b, --buffer=SIZE          set output buffer size to SIZE\n\n"
+#endif
 	 "Playback quality:\n"
 	 "  -8, --8bit                 8-bit sample quality\n"
 	 "      --16bit                16-bit sample quality\n"
@@ -263,18 +273,42 @@ static int decode_switches(int argc, char **argv)
 	  message(MSG_WARN, "could not open database -- %s", optarg);
 	break;
       case 'O':
+#ifdef DRIVER_OSS
 	if(!strcmp(optarg,"oss")) cfg.output = oss;
-	else if(!strcmp(optarg,"null")) cfg.output = null;
-	else if(!strcmp(optarg,"disk")) {
+	else
+#endif
+#ifdef DRIVER_NULL
+	if(!strcmp(optarg,"null")) cfg.output = null;
+	else
+#endif
+#ifdef DRIVER_DISK
+	if(!strcmp(optarg,"disk")) {
 	  cfg.output = disk;
 	  cfg.endless = false; // endless output is almost never desired here
 	}
-	else if(!strcmp(optarg,"esound")) cfg.output = esound;
-	else if(!strcmp(optarg,"qsa")) cfg.output = qsa;
-	else if(!strcmp(optarg,"alsa")) cfg.output = alsa;
-	else if(!strcmp(optarg,"sdl")) cfg.output = sdl;
-	else if(!strcmp(optarg,"ao")) cfg.output = ao;
-	else {
+	else
+#endif
+#ifdef DRIVER_ESOUND
+	if(!strcmp(optarg,"esound")) cfg.output = esound;
+	else
+#endif
+#ifdef DRIVER_QSA
+	if(!strcmp(optarg,"qsa")) cfg.output = qsa;
+	else
+#endif
+#ifdef DRIVER_ALSA
+	if(!strcmp(optarg,"alsa")) cfg.output = alsa;
+	else
+#endif
+#ifdef DRIVER_SDL
+	if(!strcmp(optarg,"sdl")) cfg.output = sdl;
+	else
+#endif
+#ifdef DRIVER_AO
+	if(!strcmp(optarg,"ao")) cfg.output = ao;
+	else
+#endif
+	{
 	  message(MSG_ERROR, "unknown output method -- %s", optarg);
 	  exit(EXIT_FAILURE);
 	}
@@ -545,7 +579,6 @@ int main(int argc, char **argv)
     player = new AOPlayer(opl, cfg.device, cfg.bits, cfg.channels, cfg.freq, cfg.buf_size);
     break;
 #endif
-#
 #ifdef DRIVER_SDL
   case sdl:
     player = new SDLPlayer(opl, cfg.bits, cfg.channels, cfg.freq, cfg.buf_size);
