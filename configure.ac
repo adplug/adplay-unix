@@ -121,7 +121,7 @@ fi
 # AO output
 if test ${enable_output_ao:=yes} = yes; then
    XIPH_PATH_AO(AC_DEFINE(DRIVER_AO,1,[Build AO output])
-   drivers=$drivers' ao.${OBJEXT}',
+   drivers=$drivers' ao.${OBJEXT}'
    enable_output_ao=no
    AC_MSG_RESULT([*** AO (libao) not installed ***]))
 fi
@@ -141,7 +141,7 @@ fi
 if test ${enable_output_esound:=yes} = yes; then
    AM_PATH_ESD(0.2.8,
       AC_DEFINE(DRIVER_ESOUND,1,[Build EsounD output])
-      drivers=$drivers' esound.$(OBJEXT)',
+      drivers=$drivers' esound.$(OBJEXT)'
       enable_output_esound=no
       AC_MSG_RESULT([*** EsounD (libesd) >= 0.2.8 not installed ***]))
 fi
@@ -177,7 +177,7 @@ if test ${enable_output_sdl:=yes} = yes; then
    AM_PATH_SDL2(["2.0.0"],
        AC_DEFINE(HAVE_SDL_H, 1, [Define to 1 if you have the "SDL.h" header file])
        AC_DEFINE(DRIVER_SDL, 1, [Build SDL2 output])
-       drivers=$drivers' sdl.$(OBJEXT)',
+       drivers=$drivers' sdl.$(OBJEXT)'
        try_sdl12=yes
        AC_MSG_RESULT([*** SDL libsdl2 >= 2.0.0 not installed ***])
    )
@@ -190,7 +190,7 @@ if test ${enable_output_sdl:=yes} = yes; then
      AM_PATH_SDL(["1.2.0"],
          AC_DEFINE(HAVE_SDL_H, 1, [Define to 1 if you have the "SDL.h" header file])
          AC_DEFINE(DRIVER_SDL, 1, [Build SDL1.x output])
-         drivers=$drivers' sdl.$(OBJEXT)',
+         drivers=$drivers' sdl.$(OBJEXT)'
          enable_output_sdl=no
          AC_MSG_RESULT([*** SDL libsdl >= 1.2.0 not installed ***])
      )
@@ -202,7 +202,7 @@ fi
 if test ${enable_output_alsa:=yes} = yes; then
    AM_PATH_ALSA(0.9.1,
 	AC_DEFINE(DRIVER_ALSA,1,[Build ALSA output])
-	drivers=$drivers' alsa.${OBJEXT}',
+	drivers=$drivers' alsa.${OBJEXT}'
 	enable_output_alsa=no
 	AC_MSG_RESULT([*** ALSA (libasound) >= 0.9.1 not installed ***]))
 fi
