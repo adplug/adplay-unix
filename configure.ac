@@ -96,6 +96,7 @@ AC_ARG_ENABLE([output-oss],AS_HELP_STRING([--disable-output-oss],[Disable OSS ou
 AC_ARG_ENABLE([output-null],AS_HELP_STRING([--disable-output-null],[Disable null output]))
 AC_ARG_ENABLE([output-disk],AS_HELP_STRING([--disable-output-disk],[Disable disk writer]))
 AC_ARG_ENABLE([output-esound],AS_HELP_STRING([--disable-output-esound],[Disable EsounD output]))
+AC_ARG_ENABLE([output-retrowave],AS_HELP_STRING([--disable-output-retrowave],[Disable RetroWave output]))
 AC_ARG_ENABLE([output-qsa],AS_HELP_STRING([--disable-output-qsa],[Disable QSA output]))
 AC_ARG_ENABLE([output-sdl],AS_HELP_STRING([--disable-output-sdl],[Disable SDL output]))
 AC_ARG_ENABLE([output-alsa],AS_HELP_STRING([--disable-output-alsa],[Disable ALSA output]))
@@ -144,6 +145,12 @@ if test ${enable_output_esound:=yes} = yes; then
       drivers=$drivers' esound.$(OBJEXT)',
       enable_output_esound=no
       AC_MSG_RESULT([*** EsounD (libesd) >= 0.2.8 not installed ***]))
+fi
+
+# RetroWave output
+if test ${enable_output_retrowave:=yes} = yes; then
+   AC_DEFINE(DRIVER_RETROWAVE,1,[Build RetroWave output])
+   drivers=$drivers' retrowave.$(OBJEXT)'
 fi
 
 # QSA driver
@@ -219,11 +226,12 @@ echo "Configuration:"
 echo "Install path:             ${prefix}"
 echo ""
 echo "Build output mechanisms:"
-echo "OSS output (oss):         ${enable_output_oss}"
-echo "Null output (null):       ${enable_output_null}"
-echo "Disk writer (disk):       ${enable_output_disk}"
-echo "EsounD output (esound):   ${enable_output_esound}"
-echo "QSA output (qsa):         ${enable_output_qsa}"
-echo "SDL output (sdl):         ${enable_output_sdl}"
-echo "ALSA output (alsa):       ${enable_output_alsa}"
-echo "Libao output (ao):        ${enable_output_ao}"
+echo "OSS output (oss):            ${enable_output_oss}"
+echo "Null output (null):          ${enable_output_null}"
+echo "Disk writer (disk):          ${enable_output_disk}"
+echo "EsounD output (esound):      ${enable_output_esound}"
+echo "Retrowave output (retrowave) ${enable_output_retrowave}"
+echo "QSA output (qsa):            ${enable_output_qsa}"
+echo "SDL output (sdl):            ${enable_output_sdl}"
+echo "ALSA output (alsa):          ${enable_output_alsa}"
+echo "Libao output (ao):           ${enable_output_ao}"

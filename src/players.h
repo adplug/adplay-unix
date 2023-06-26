@@ -28,7 +28,7 @@
 #include "config.h"
 
 // Enumerate ALL outputs (regardless of availability)
-enum Outputs {none, null, ao, oss, disk, esound, qsa, sdl, alsa};
+enum Outputs {none, null, ao, oss, disk, esound, retrowave, qsa, sdl, alsa};
 
 #define DEFAULT_DRIVER none
 
@@ -37,6 +37,12 @@ enum Outputs {none, null, ao, oss, disk, esound, qsa, sdl, alsa};
 #include "null.h"
 #undef DEFAULT_DRIVER
 #define DEFAULT_DRIVER null
+#endif
+
+#ifdef DRIVER_RETROWAVE
+#include "retrowave.h"
+#undef DEFAULT_DRIVER
+#define DEFAULT_DRIVER retrowave
 #endif
 
 // Disk writer
