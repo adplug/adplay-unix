@@ -27,3 +27,4 @@ m4/lt~obsolete.m4
 src/adplay
 src/config.h*
 src/.libs/
+*.exe
