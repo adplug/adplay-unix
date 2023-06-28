@@ -24,6 +24,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <string.h>
 #include <sys/file.h>
 #include <termios.h>
@@ -41,13 +42,29 @@
 #define RETROWAVE_PLAYER_TIME_REF       CLOCK_MONOTONIC
 #endif
 
-
 typedef enum {
 	RetroWave_Board_Unknown = 0,
 	RetroWave_Board_OPL3 = 0x21 << 1,
 	RetroWave_Board_MiniBlaster = 0x20 << 1,
 	RetroWave_Board_MasterGear = 0x24 << 1
 } RetroWaveBoardType;
+
+static RetroWaveOpl *instance;
+
+static void retrowave_sighandler (int ignore)
+{
+	static int recursive = 0;
+
+	if (!recursive)
+	{
+		recursive = 1;
+		if (instance)
+		{
+			instance->reset();
+		}
+		_exit(0);
+	}
+}
 
 RetroWaveOpl::RetroWaveOpl(const char *filename)
 {
@@ -304,12 +321,28 @@ void RetroWaveOpl::init(void)
 RetroWavePlayer::RetroWavePlayer(const char *filename) : EmuPlayer(0, 16, 2, 44100, 65536)
 {
 	retrowaveopl = new RetroWaveOpl(filename ? filename : "/dev/ttyACM0");
+
+	instance = retrowaveopl;
+#ifdef SIGHUP
+	signal (SIGHUP, retrowave_sighandler);
+#endif
+#ifdef SIGQUIT
+	signal (SIGQUIT, retrowave_sighandler);
+#endif
+#ifdef SIGINT
+	signal (SIGINT, retrowave_sighandler);
+#endif
+#ifdef SIGKILL
+	signal (SIGKILL, retrowave_sighandler);
+#endif
+
 	clock_gettime(RETROWAVE_PLAYER_TIME_REF, &nexttick);
 }
 
 RetroWavePlayer::~RetroWavePlayer()
 {
 	delete retrowaveopl;
+	instance = NULL;
 	retrowaveopl = NULL;
 }
 

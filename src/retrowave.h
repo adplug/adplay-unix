@@ -31,11 +31,11 @@ public:
 
 	void io_prepare(void);
 	void flush(void);
+	void reset(void);
 
 protected:
 	void queue_port0(uint8_t reg, uint8_t val);
 	void queue_port1(uint8_t reg, uint8_t val);
-	void reset(void);
 
 private:
 	int fd = -1;
