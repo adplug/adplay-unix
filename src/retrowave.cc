@@ -94,11 +94,12 @@ RetroWaveOpl::RetroWaveOpl(const char *filename)
 	}
 	cfmakeraw(&tio);
 
+#if 0 /* setting the speed appears to not be needed, and 2000000 is not valid on all operating systems */
 #ifndef __APPLE__
 	cfsetispeed(&tio, 2000000);
 	cfsetospeed(&tio, 2000000);
 #endif
-
+#endif
 	if (tcgetattr(fd, &tio))
 	{
 		fprintf(stderr, "Failed to perform tcsetattr() on device %s, not a tty/serial device?: %s\n", filename, strerror(errno));
@@ -107,6 +108,7 @@ RetroWaveOpl::RetroWaveOpl(const char *filename)
 		exit(EXIT_FAILURE);
 	}
 
+#if 0 /* setting the speed appears to not be needed, and 2000000 is not valid on all operating systems */
 #ifdef __APPLE__
 	int speed = 2000000;
 
@@ -116,16 +118,28 @@ RetroWaveOpl::RetroWaveOpl(const char *filename)
 		exit(EXIT_FAILURE);
 	}
 #endif
+#endif
 
 	cmd_buffer[0] = 0x00;
 	cmd_buffer_used=1;
 	io_prepare();
 	flush();
 
+	/* GPIOA.0 = /IC  Initial clear (Reset)
+	 * GPIOA.1 = A0   Low=Address, High=Data
+	 * GPIOA.2 = A1   Low=Bank0,   High=Bank1
+	 * GPIOA.3 = /WR  Write enable
+	 * GPIOA.4 = /CS  Chip Select
+	 * GPIOA.5 =
+	 * GPIOA.6 =
+	 * GPIOA.7 =
+	 * GPIOB[0:7] = D[0:7]
+	 */
+
 	for (uint8_t i=0x20; i<0x28; i++)
 	{
 		cmd_prepare((uint8_t)(i<<1), 0x0a, 1); // IOCON register
-		cmd_buffer[cmd_buffer_used++] = 0x28;  // Enable: HAEN, SEQOP
+		cmd_buffer[cmd_buffer_used++] = 0x28;  // HAEN=1 SEQOP=1 BANK=0
 		io_prepare();
 		flush();
 
@@ -172,24 +186,24 @@ void RetroWaveOpl::cmd_prepare(uint8_t io_addr, uint8_t io_reg, const int len)
 
 void RetroWaveOpl::queue_port0(uint8_t reg, uint8_t val)
 {
-	cmd_prepare(RetroWave_Board_OPL3, 0x12, 6);
+	cmd_prepare(RetroWave_Board_OPL3, 0x12, 6); // GPIOA register
 	cmd_buffer[cmd_buffer_used++] = 0xe1;
 	cmd_buffer[cmd_buffer_used++] = reg;
 	cmd_buffer[cmd_buffer_used++] = 0xe3;
 	cmd_buffer[cmd_buffer_used++] = val;
 	cmd_buffer[cmd_buffer_used++] = 0xfb;
-	cmd_buffer[cmd_buffer_used++] = val;
+	cmd_buffer[cmd_buffer_used++] = val; // Retrowave express OPL3 seems to only like even data writes
 }
 
 void RetroWaveOpl::queue_port1(uint8_t reg, uint8_t val)
 {
-	cmd_prepare(RetroWave_Board_OPL3, 0x12, 6);
+	cmd_prepare(RetroWave_Board_OPL3, 0x12, 6); // GPIOA register
 	cmd_buffer[cmd_buffer_used++] = 0xe5;
 	cmd_buffer[cmd_buffer_used++] = reg;
 	cmd_buffer[cmd_buffer_used++] = 0xe7;
 	cmd_buffer[cmd_buffer_used++] = val;
 	cmd_buffer[cmd_buffer_used++] = 0xfb;
-	cmd_buffer[cmd_buffer_used++] = val;
+	cmd_buffer[cmd_buffer_used++] = val; // Retrowave express OPL3 seems to only like even data writes
 }
 
 void RetroWaveOpl::reset(void)
@@ -200,62 +214,83 @@ void RetroWaveOpl::reset(void)
 		flush();
 	}
 
-	cmd_prepare(RetroWave_Board_OPL3, 0x12, 1);
+#if 0 // reset by /IC, makes click sound
+	cmd_prepare(RetroWave_Board_OPL3, 0x12, 1); // GPIOA register
 	cmd_buffer[cmd_buffer_used++] = 0xfe;
+	cmd_buffer[cmd_buffer_used++] = 0x00; // Retrowave express OPL3 seems to only like even data writes
 	io_prepare();
 	flush();
 
-	cmd_prepare(RetroWave_Board_OPL3, 0x12, 1);
+	usleep (1700); /* chip needs about 1.6ms to safely reset, so delay 1.7ms */
+
+	cmd_prepare(RetroWave_Board_OPL3, 0x12, 1); // GPIOA register
 	cmd_buffer[cmd_buffer_used++] = 0xff;
+	cmd_buffer[cmd_buffer_used++] = 0x00; // Retrowave express OPL3 seems to only like even data writes
 	io_prepare();
 	flush();
+#else // reset by registers
+	queue_port1 (5, 1); // Enable OPL3 mode
+	queue_port1 (4, 0); // Disable all 4-OP connections
 
-	queue_port1 (5, 1);
-	queue_port1 (4, 0);
-
-	for (int i=0x20; i < 0x35; i++)
+	for (int i=0x20; i <= 0x35; i++)
+	{
+		queue_port0 (i, 0x01);
+		queue_port1 (i, 0x01);
+	}
+	for (int i=0x40; i <= 0x55; i++)
+	{
+		queue_port0 (i, 0x3f);
+		queue_port1 (i, 0x3f);
+	}
+	for (int i=0x60; i <= 0x75; i++)
+	{
+		queue_port0 (i, 0xee);
+		queue_port1 (i, 0xee);
+	}
+	for (int i=0x80; i <= 0x95; i++)
+	{
+		queue_port0 (i, 0x0e);
+		queue_port1 (i, 0x0e);
+	}
+	for (int i=0xa0; i <= 0xa8; i++)
+	{
+		queue_port0 (i, 0x80);
+		queue_port1 (i, 0x80);
+	}
+	for (int i=0xb0; i <= 0xb8; i++)
+	{
+		queue_port0 (i, 0x04);
+		queue_port1 (i, 0x04);
+	}
+	for (int i=0xbd; i <= 0xbd; i++)
 	{
 		queue_port0 (i, 0);
 		queue_port1 (i, 0);
 	}
-	for (int i=0xa0; i < 0xa8; i++)
+	for (int i=0xc0; i <= 0xc8; i++)
+	{
+		queue_port0 (i, 0x30); // Enable Left and Right
+		queue_port1 (i, 0x30); // Enable Left and Right
+	}
+	for (int i=0xe0; i <= 0xf5; i++)
 	{
 		queue_port0 (i, 0);
 		queue_port1 (i, 0);
 	}
-	for (int i=0xb0; i < 0xb8; i++)
+	for (int i=0x08; i <= 0x08; i++)
 	{
 		queue_port0 (i, 0);
 		queue_port1 (i, 0);
 	}
-	for (int i=0xbd; i < 0xbd; i++)
+	for (int i=0x01; i <= 0x01; i++)
 	{
 		queue_port0 (i, 0);
 		queue_port1 (i, 0);
 	}
-	for (int i=0xc0; i < 0xc8; i++)
-	{
-		queue_port0 (i, 0x30);
-		queue_port1 (i, 0x30);
-	}
-	for (int i=0xe0; i < 0xf5; i++)
-	{
-		queue_port0 (i, 0);
-		queue_port1 (i, 0);
-	}
-	for (int i=0x08; i < 0x08; i++)
-	{
-		queue_port0 (i, 0);
-		queue_port1 (i, 0);
-	}
-	for (int i=0x01; i < 0x01; i++)
-	{
-		queue_port0 (i, 0);
-		queue_port1 (i, 0);
-	}
-	queue_port1 (5, 0);
+	queue_port1 (5, 0); // OPL2 mode
 	io_prepare();
 	flush();
+#endif
 }
 
 void RetroWaveOpl::io_prepare(void)
@@ -297,7 +332,20 @@ void RetroWaveOpl::flush(void)
 	{
 		return;
 	}
+#if defined(__APPLE__) /* Atleast OS X El Capitan has issues with buffering causing corruption*/
+        int pos = 0;
+        while (pos < io_buffer_used)
+        {
+                int target = io_buffer_used - pos;
+		if (target > 128) target = 128;
+                int res;
+                ::write(fd, io_buffer + pos, target);
+                pos += target;
+                usleep (250);
+        }
+#else
 	::write(fd, io_buffer, io_buffer_used);
+#endif
 	io_buffer_used = 0;
 }
 
