@@ -151,6 +151,10 @@ static void usage()
 	 "EsounD driver (esound) specific:\n"
 	 "  -d, --device=URL           URL to EsounD server host (hostname:port)\n\n"
 #endif
+#ifdef DRIVER_RETROWAVE
+	 "RetroWave driver (retrowave) specific:\n"
+	 "   -d --device=DEVICE        set sound device to DEVICE\n\n"
+#endif
 #ifdef DRIVER_SDL
 	 "SDL driver (sdl) specific:\n"
 	 "  -b, --buffer=SIZE          set output buffer size to SIZE\n\n"
@@ -201,6 +205,9 @@ static void usage()
 #endif
 #ifdef DRIVER_ESOUND
 	 "esound "
+#endif
+#ifdef DRIVER_RETROWAVE
+	 "retrowave "
 #endif
 #ifdef DRIVER_QSA
 	 "qsa "
@@ -298,6 +305,10 @@ static int decode_switches(int argc, char **argv)
 #endif
 #ifdef DRIVER_ALSA
 	if(!strcmp(optarg,"alsa")) cfg.output = alsa;
+	else
+#endif
+#ifdef DRIVER_RETROWAVE
+	if(!strcmp(optarg,"retrowave")) cfg.output = retrowave;
 	else
 #endif
 #ifdef DRIVER_SDL
@@ -577,6 +588,15 @@ int main(int argc, char **argv)
 #ifdef DRIVER_AO
   case ao:
     player = new AOPlayer(opl, cfg.device, cfg.bits, cfg.channels, cfg.freq, cfg.buf_size);
+    break;
+#endif
+#ifdef DRIVER_RETROWAVE
+  case retrowave:
+    if (opl) {
+      delete(opl);
+      opl = 0;
+    }
+    player = new RetroWavePlayer(cfg.device);
     break;
 #endif
 #ifdef DRIVER_SDL
