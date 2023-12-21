@@ -28,10 +28,10 @@
 #include <adplug/wemuopl.h>
 
 /*
- * Apple (OS X) and Sun systems declare getopt in unistd.h, other systems
- * (Linux) use getopt.h.
+ * Sun systems declare getopt in unistd.h,
+ * other systems (Linux, Apple) use getopt.h.
  */
-#if defined (__APPLE__) || (defined(__SVR4) && defined(__sun))
+#if (defined(__SVR4) && defined(__sun))
 #	include <unistd.h>
 #else
 #	ifdef HAVE_GETOPT_H
