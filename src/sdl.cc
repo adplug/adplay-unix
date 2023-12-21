@@ -19,7 +19,7 @@
 
 #include <unistd.h>
 
-#include "sdl.h"
+#include "sdl_driver.h"
 #include "defines.h"
 
 SDLPlayer::SDLPlayer(Copl *nopl, unsigned char bits, int channels, int freq,

@@ -55,7 +55,7 @@ enum Outputs {none, null, ao, oss, disk, esound, qsa, sdl, alsa};
 
 // SDL driver
 #ifdef DRIVER_SDL
-#include "sdl.h"
+#include "sdl_driver.h"
 #undef DEFAULT_DRIVER
 #define DEFAULT_DRIVER sdl
 #endif
