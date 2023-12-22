@@ -25,8 +25,6 @@
 #ifndef H_PLAYERS
 #define H_PLAYERS
 
-#include "config.h"
-
 // Enumerate ALL outputs (regardless of availability)
 enum Outputs {none, null, ao, oss, disk, esound, qsa, sdl, alsa};
 

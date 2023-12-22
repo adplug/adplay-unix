@@ -7,10 +7,13 @@ EXTRA_adplay_SOURCES = oss.cc oss.h null.h disk.cc disk.h esound.cc esound.h \
 	getopt1.c getopt.h
 
 adplay_LDADD = $(drivers) $(adplug_LIBS) @ESD_LIBS@ @QSA_LIBS@ @SDL_LIBS@ \
-	@ALSA_LIBS@ @AO_LIBS@ $(GETOPT_SOURCES)
-adplay_DEPENDENCIES = $(drivers) $(GETOPT_SOURCES)
+	@ALSA_LIBS@ @AO_LIBS@
+adplay_DEPENDENCIES = $(drivers)
 
 adplug_data_dir = $(sharedstatedir)/adplug
 
 AM_CPPFLAGS = $(adplug_CFLAGS) @ESD_CFLAGS@ @SDL_CFLAGS@ @ALSA_CFLAGS@ \
-	-DADPLUG_DATA_DIR=\"$(adplug_data_dir)\"
+	-DADPLUG_DATA_DIR=\"$(adplug_data_dir)\" \
+	-I$(top_builddir)/gnulib -I$(top_srcdir)/gnulib
+
+LDADD = gnulib/libgnu.a
