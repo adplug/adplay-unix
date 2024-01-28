@@ -33,7 +33,7 @@ AOPlayer::AOPlayer(Copl *nopl, const char *device, unsigned char bits,
 		     int channels, int freq, unsigned long bufsize)
   : EmuPlayer(nopl, bits, channels, freq, bufsize)
 {
-	ao_sample_format format;
+	ao_sample_format format = {0};
 	int default_driver;
 
 	ao_initialize();
