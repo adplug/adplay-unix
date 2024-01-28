@@ -425,7 +425,7 @@ int main(int argc, char **argv)
 {
   int			optind, i;
   const char		*homedir;
-  char			*userdb;
+  char			*userdb = NULL;
 
   // init
   program_name = argv[0];
