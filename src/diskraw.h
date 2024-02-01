@@ -14,26 +14,32 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
+ * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef H_NULL
-#define H_NULL
+#ifndef H_DISKRAW
+#define H_DISKRAW
 
-#include <adplug/silentopl.h>
 #include "output.h"
 
-class NullOutput: public Player
+/* pairs up to AdPlay CDiskopl */
+class DiskRawWriter: public Player
 {
 public:
-  virtual void frame()
-    { }
+  DiskRawWriter(CDiskopl *nopl)
+    :opl(nopl)
+  { }
+
+  virtual void frame() {
+    playing = p->update();
+    opl->update(p);
+  }
 
   virtual Copl *get_opl()
-    { return &opl; }
+    { return opl; }
 
 private:
-  CSilentopl opl;
+  CDiskopl *opl;
 };
 
 #endif

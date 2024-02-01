@@ -324,8 +324,7 @@ static int decode_switches(int argc, char **argv)
 #endif
 	else if(!strcmp(optarg, "rawout")) {
 	  cfg.emutype = Emu_Rawout;
-	  cfg.output = null;
-	  cfg.endless = false;
+	  cfg.endless = false; // endless output is almost never desired here
 	}
 
 	else {
@@ -337,6 +336,10 @@ static int decode_switches(int argc, char **argv)
       }
   }
   if (!cfg.loops) cfg.loops = 1;
+
+  if (cfg.emutype == Emu_Rawout) {
+    cfg.output = diskraw; // output must be diskraw when Emu_Rawout is selected
+  }
 
   return optind;
 }
@@ -434,6 +437,7 @@ int main(int argc, char **argv)
   int			optind, i;
   const char		*homedir;
   char			*userdb = NULL;
+  CDiskopl              *dopl = 0;
 
   // init
   program_name = argv[0];
@@ -549,7 +553,8 @@ int main(int argc, char **argv)
   	break;
 #endif
   case Emu_Rawout:
-    opl = new CDiskopl(cfg.device);
+    dopl = new CDiskopl(cfg.device);
+    opl = dopl;
   }
 
   // init player
@@ -565,7 +570,7 @@ int main(int argc, char **argv)
 #endif
 #ifdef DRIVER_NULL
   case null:
-    player = new NullOutput(opl);
+    player = new NullOutput();
     break;
 #endif
 #ifdef DRIVER_DISK
@@ -600,6 +605,10 @@ int main(int argc, char **argv)
 			    cfg.buf_size);
     break;
 #endif
+  case diskraw:
+    player = new DiskRawWriter(dopl);
+    dopl = NULL;
+    break;
   default:
     message(MSG_ERROR, "output method not available");
     exit(EXIT_FAILURE);

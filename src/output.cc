@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <adplug/emuopl.h>
 #include <adplug/kemuopl.h>
-#include <adplug/diskopl.h>
 
 #include "output.h"
 #include "defines.h"
@@ -73,11 +72,6 @@ void EmuPlayer::frame()
     }
     i = MIN(towrite, (long)(minicnt / p->getrefresh() + 4) & ~3);
     opl->update((short *)pos, i);
-    CDiskopl *dopl = dynamic_cast<CDiskopl *>(opl);
-    if (dopl != NULL) {
-      dopl->update(p);
-    }
-
     pos += i * getsampsize(); towrite -= i;
     i = (long)(p->getrefresh() * i);
     minicnt -= MAX(1, i);
