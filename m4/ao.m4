@@ -2,6 +2,7 @@
 # Configure paths for libao
 # Jack Moffitt <jack@icecast.org> 10-21-2000
 # Shamelessly stolen from Owen Taylor and Manish Singh
+# AdPlay/Unix updated some usage of deprecated macros
 
 dnl XIPH_PATH_AO([ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 dnl Test for libao, and define AO_CFLAGS and AO_LIBS
@@ -47,17 +48,18 @@ dnl
 dnl Now check if the installed ao is sufficiently new.
 dnl
       rm -f conf.aotest
-      AC_TRY_RUN([
+      AC_RUN_IFELSE([AC_LANG_PROGRAM([[
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ao/ao.h>
+]],[[
 int main ()
 {
   system("touch conf.aotest");
   return 0;
 }
-],, no_ao=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
+]])],, no_ao=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
        CFLAGS="$ac_save_CFLAGS"
        LIBS="$ac_save_LIBS"
   fi
@@ -72,10 +74,10 @@ int main ()
        echo "*** Could not run ao test program, checking why..."
        CFLAGS="$CFLAGS $AO_CFLAGS"
        LIBS="$LIBS $AO_LIBS"
-       AC_TRY_LINK([
+       AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <stdio.h>
 #include <ao/ao.h>
-],     [ return 0; ],
+]],[[ return 0; ]])],
        [ echo "*** The test program compiled, but did not run. This usually means"
        echo "*** that the run-time linker is not finding ao or finding the wrong"
        echo "*** version of ao. If it is not finding ao, you'll need to set your"
