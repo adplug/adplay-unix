@@ -28,7 +28,7 @@
 #include "config.h"
 
 // Enumerate ALL outputs (regardless of availability)
-enum Outputs {none, null, ao, oss, disk, esound, qsa, sdl, alsa};
+enum Outputs {none, null, ao, oss, disk, esound, qsa, sdl, alsa, diskraw};
 
 #define DEFAULT_DRIVER none
 
@@ -87,5 +87,7 @@ enum Outputs {none, null, ao, oss, disk, esound, qsa, sdl, alsa};
 #undef DEFAULT_DRIVER
 #define DEFAULT_DRIVER qsa
 #endif
+
+#include "diskraw.h"
 
 #endif
