@@ -54,11 +54,8 @@ dnl
 #include <string.h>
 #include <ao/ao.h>
 ]],[[
-int main ()
-{
-  system("touch conf.aotest");
-  return 0;
-}
+system("touch conf.aotest");
+return 0;
 ]])],, no_ao=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
        CFLAGS="$ac_save_CFLAGS"
        LIBS="$ac_save_LIBS"

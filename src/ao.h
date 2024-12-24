@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001 - 2003 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2003, 2024 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,11 @@
  */
 
 #ifndef H_AO_
-#define H_AO
+#define H_AO_
+
+#include <ao/ao.h>
 
 #include "output.h"
-#include <ao/ao.h>
 
 class AOPlayer: public EmuPlayer
 {
@@ -34,7 +35,7 @@ protected:
   virtual void output(const void *buf, unsigned long size);
 
 private:
-	ao_device *aodevice;
+  ao_device *aodevice;
 };
 
 #endif
