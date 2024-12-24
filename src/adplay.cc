@@ -1,6 +1,6 @@
 /*
  * AdPlay/UNIX - OPL2 audio player
- * Copyright (C) 2001 - 2017 Simon Peter <dn.tlp@gmx.net>
+ * Copyright (C) 2001 - 2017, 2024 Simon Peter <dn.tlp@gmx.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -405,8 +405,6 @@ static void shutdown(void)
 {
   if(player) delete player;
   if(opl) delete opl;
-  // Try to properly reposition terminal cursor, if Ctrl+C is used to exit.
-  printf("\n\n");
 }
 
 static void sighandler(int signal)
@@ -414,6 +412,8 @@ static void sighandler(int signal)
 {
   switch(signal) {
   case SIGINT:
+    // Try to properly reposition terminal cursor, if Ctrl+C is used to exit.
+    printf("\n\n");
   case SIGTERM:
     exit(EXIT_SUCCESS);
   }
