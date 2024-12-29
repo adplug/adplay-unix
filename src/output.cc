@@ -38,6 +38,8 @@ Player::~Player()
 
 /***** EmuPlayer *****/
 
+long EmuPlayer::minicnt = 0;
+
 EmuPlayer::EmuPlayer(Copl *nopl, unsigned char nbits, unsigned char nchannels,
 		     unsigned long nfreq, unsigned long nbufsize)
   : opl(nopl), buf_size(nbufsize), freq(nfreq), bits(nbits), channels(nchannels)
@@ -60,7 +62,6 @@ void EmuPlayer::setbufsize(unsigned long nbufsize)
 
 void EmuPlayer::frame()
 {
-  static long minicnt = 0;
   long i, towrite = buf_size;
   char *pos = audiobuf;
 
@@ -79,4 +80,9 @@ void EmuPlayer::frame()
 
   // call output driver
   output(audiobuf, buf_size * getsampsize());
+}
+
+void EmuPlayer::reset()
+{
+  minicnt = 0;
 }

@@ -33,6 +33,7 @@ public:
 
   virtual void frame() = 0;
   virtual Copl *get_opl() = 0;
+  virtual void reset() {};
 };
 
 class EmuPlayer: public Player
@@ -51,6 +52,7 @@ public:
   virtual void setbufsize(unsigned long nbufsize);
   virtual void frame();
   virtual Copl *get_opl() { return opl; }
+  virtual void reset();
 
 protected:
   virtual void output(const void *buf, unsigned long size) = 0;
@@ -58,6 +60,9 @@ protected:
   // This time, size is measured in bytes, not samples!
 
   unsigned char getsampsize() { return (channels * (bits / 8)); }
+
+private:
+  static long minicnt;
 };
 
 #endif
