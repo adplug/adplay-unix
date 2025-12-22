@@ -13,6 +13,8 @@ Before release:
 
  * Create new tag: `git tag v1.2.3` and `git push origin v1.2.3`
 
+ * Run 'make dist' to create tarballs and upload to github
+
 After release:
 
  * Update version numbers as above to match the "next" release.  This means the
