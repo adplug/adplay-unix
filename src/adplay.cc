@@ -80,7 +80,6 @@ typedef enum {
 #ifdef HAVE_ADPLUG_NUKEDOPL
 	Emu_Nuked,
 #endif
-	Emu_Rawout,
 } EmuType;
 
 /***** Global variables *****/
@@ -162,6 +161,10 @@ static void usage()
 	 "  -d, --device=DEVICE        set sound device to DEVICE\n"
 	 "  -b, --buffer=SIZE          set output buffer size to SIZE\n\n"
 #endif
+#ifdef DRIVER_RAW
+	 "RAW file writer (raw) specific:\n"
+	 "  -d, --device=FILE          output to FILE\n\n"
+#endif
 	 "Playback quality:\n"
 	 "  -8, --8bit                 8-bit sample quality\n"
 	 "      --16bit                16-bit sample quality\n"
@@ -190,31 +193,34 @@ static void usage()
 #ifdef HAVE_ADPLUG_NUKEDOPL
   printf(" nuked");
 #endif
-  printf(" rawout\n");
-  printf("Available output mechanisms: "
+  printf("\n");
+  printf("Available output mechanisms:"
 #ifdef DRIVER_OSS
-	 "oss "
+	 " oss"
 #endif
 #ifdef DRIVER_NULL
-	 "null "
+	 " null"
 #endif
 #ifdef DRIVER_DISK
-	 "disk "
+	 " disk"
 #endif
 #ifdef DRIVER_ESOUND
-	 "esound "
+	 " esound"
 #endif
 #ifdef DRIVER_QSA
-	 "qsa "
+	 " qsa"
 #endif
 #ifdef DRIVER_SDL
-	 "sdl "
+	 " sdl"
 #endif
 #ifdef DRIVER_AO
-	 "ao "
+	 " ao"
 #endif
 #ifdef DRIVER_ALSA
-	 "alsa "
+	 " alsa"
+#endif
+#ifdef DRIVER_RAW
+	 " raw"
 #endif
 	 "\n");
 }
@@ -310,6 +316,13 @@ static int decode_switches(int argc, char **argv)
 	if(!strcmp(optarg,"ao")) cfg.output = ao;
 	else
 #endif
+#ifdef DRIVER_RAW
+	if(!strcmp(optarg,"raw")) {
+	  cfg.output = raw;
+	  cfg.endless = false; // endless output is almost never desired here
+	}
+	else
+#endif
 	{
 	  message(MSG_ERROR, "unknown output method -- %s", optarg);
 	  exit(EXIT_FAILURE);
@@ -322,11 +335,6 @@ static int decode_switches(int argc, char **argv)
 #ifdef HAVE_ADPLUG_NUKEDOPL
 	else if(!strcmp(optarg, "nuked")) cfg.emutype = Emu_Nuked;
 #endif
-	else if(!strcmp(optarg, "rawout")) {
-	  cfg.emutype = Emu_Rawout;
-	  cfg.endless = false; // endless output is almost never desired here
-	}
-
 	else {
 	  message(MSG_ERROR, "unknown emulator -- %s", optarg);
 	  exit(EXIT_FAILURE);
@@ -336,10 +344,6 @@ static int decode_switches(int argc, char **argv)
       }
   }
   if (!cfg.loops) cfg.loops = 1;
-
-  if (cfg.emutype == Emu_Rawout) {
-    cfg.output = diskraw; // output must be diskraw when Emu_Rawout is selected
-  }
 
   return optind;
 }
@@ -438,7 +442,6 @@ int main(int argc, char **argv)
   int			optind, i;
   const char		*homedir;
   char			*userdb = NULL;
-  CDiskopl              *dopl = 0;
 
   // init
   program_name = argv[0];
@@ -553,9 +556,6 @@ int main(int argc, char **argv)
   	}
   	break;
 #endif
-  case Emu_Rawout:
-    dopl = new CDiskopl(cfg.device);
-    opl = dopl;
   }
 
   // init player
@@ -606,10 +606,11 @@ int main(int argc, char **argv)
 			    cfg.buf_size);
     break;
 #endif
-  case diskraw:
-    player = new DiskRawWriter(dopl);
-    dopl = NULL;
+#ifdef DRIVER_RAW
+  case raw:
+    player = new DiskRawWriter(new CDiskopl(cfg.device));
     break;
+#endif
   default:
     message(MSG_ERROR, "output method not available");
     exit(EXIT_FAILURE);

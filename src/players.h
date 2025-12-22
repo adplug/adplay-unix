@@ -28,7 +28,7 @@
 #include "config.h"
 
 // Enumerate ALL outputs (regardless of availability)
-enum Outputs {none, null, ao, oss, disk, esound, qsa, sdl, alsa, diskraw};
+enum Outputs {none, null, ao, oss, disk, esound, qsa, sdl, alsa, raw};
 
 #define DEFAULT_DRIVER none
 
@@ -37,6 +37,13 @@ enum Outputs {none, null, ao, oss, disk, esound, qsa, sdl, alsa, diskraw};
 #include "null.h"
 #undef DEFAULT_DRIVER
 #define DEFAULT_DRIVER null
+#endif
+
+// RAW driver
+#ifdef DRIVER_RAW
+#include "diskraw.h"
+#undef DEFAULT_DRIVER
+#define DEFAULT_DRIVER raw
 #endif
 
 // Disk writer
@@ -87,7 +94,5 @@ enum Outputs {none, null, ao, oss, disk, esound, qsa, sdl, alsa, diskraw};
 #undef DEFAULT_DRIVER
 #define DEFAULT_DRIVER qsa
 #endif
-
-#include "diskraw.h"
 
 #endif

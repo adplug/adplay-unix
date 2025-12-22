@@ -1,5 +1,12 @@
 This is a brief overview of user-visible changes in adplay.
 
+Changes for version 1.9:
+------------------------
+- Tie in with AdPlug 2.4
+- SDL2 compilation support
+- Fix a subsong playback corner case
+- RAW file writer
+
 Changes for version 1.8.1:
 --------------------------
 - Tie in with AdPlug 2.3.2

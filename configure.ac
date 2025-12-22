@@ -94,6 +94,7 @@ CPPFLAGS="$oldcppflags"
 # Define user option arguments
 AC_ARG_ENABLE([output-oss],AS_HELP_STRING([--disable-output-oss],[Disable OSS output]))
 AC_ARG_ENABLE([output-null],AS_HELP_STRING([--disable-output-null],[Disable null output]))
+AC_ARG_ENABLE([output-raw],AS_HELP_STRING([--disable-output-raw],[Disable RAW file writer]))
 AC_ARG_ENABLE([output-disk],AS_HELP_STRING([--disable-output-disk],[Disable disk writer]))
 AC_ARG_ENABLE([output-esound],AS_HELP_STRING([--disable-output-esound],[Disable EsounD output]))
 AC_ARG_ENABLE([output-qsa],AS_HELP_STRING([--disable-output-qsa],[Disable QSA output]))
@@ -135,6 +136,11 @@ fi
 if test ${enable_output_disk:=yes} = yes; then
    AC_DEFINE(DRIVER_DISK,1,[Build disk writer])
    drivers=$drivers' disk.$(OBJEXT)'
+fi
+
+# RAW file writer
+if test ${enable_output_raw:=yes} = yes; then
+   AC_DEFINE(DRIVER_RAW,1,[Build disk writer])
 fi
 
 # EsounD output
@@ -224,6 +230,7 @@ echo ""
 echo "Build output mechanisms:"
 echo "OSS output (oss):         ${enable_output_oss}"
 echo "Null output (null):       ${enable_output_null}"
+echo "RAW file writer (raw):    ${enable_output_raw}"
 echo "Disk writer (disk):       ${enable_output_disk}"
 echo "EsounD output (esound):   ${enable_output_esound}"
 echo "QSA output (qsa):         ${enable_output_qsa}"
