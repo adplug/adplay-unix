@@ -26,6 +26,7 @@
 #include <adplug/emuopl.h>
 #include <adplug/kemuopl.h>
 #include <adplug/wemuopl.h>
+#include <adplug/diskopl.h>
 
 /*
  * Sun systems declare getopt in unistd.h,
@@ -79,6 +80,7 @@ typedef enum {
 #ifdef HAVE_ADPLUG_NUKEDOPL
 	Emu_Nuked,
 #endif
+	Emu_Rawout,
 } EmuType;
 
 /***** Global variables *****/
@@ -184,11 +186,11 @@ static void usage()
 	 program_name);
 
   // Print list of available output mechanisms
-  printf("Available emulators: satoh ken woody ");
+  printf("Available emulators: satoh ken woody");
 #ifdef HAVE_ADPLUG_NUKEDOPL
-  printf("nuked");
+  printf(" nuked");
 #endif
-  printf("\n");
+  printf(" rawout\n");
   printf("Available output mechanisms: "
 #ifdef DRIVER_OSS
 	 "oss "
@@ -320,6 +322,11 @@ static int decode_switches(int argc, char **argv)
 #ifdef HAVE_ADPLUG_NUKEDOPL
 	else if(!strcmp(optarg, "nuked")) cfg.emutype = Emu_Nuked;
 #endif
+	else if(!strcmp(optarg, "rawout")) {
+	  cfg.emutype = Emu_Rawout;
+	  cfg.endless = false; // endless output is almost never desired here
+	}
+
 	else {
 	  message(MSG_ERROR, "unknown emulator -- %s", optarg);
 	  exit(EXIT_FAILURE);
@@ -329,6 +336,10 @@ static int decode_switches(int argc, char **argv)
       }
   }
   if (!cfg.loops) cfg.loops = 1;
+
+  if (cfg.emutype == Emu_Rawout) {
+    cfg.output = diskraw; // output must be diskraw when Emu_Rawout is selected
+  }
 
   return optind;
 }
@@ -427,6 +438,7 @@ int main(int argc, char **argv)
   int			optind, i;
   const char		*homedir;
   char			*userdb = NULL;
+  CDiskopl              *dopl = 0;
 
   // init
   program_name = argv[0];
@@ -541,6 +553,9 @@ int main(int argc, char **argv)
   	}
   	break;
 #endif
+  case Emu_Rawout:
+    dopl = new CDiskopl(cfg.device);
+    opl = dopl;
   }
 
   // init player
@@ -591,6 +606,10 @@ int main(int argc, char **argv)
 			    cfg.buf_size);
     break;
 #endif
+  case diskraw:
+    player = new DiskRawWriter(dopl);
+    dopl = NULL;
+    break;
   default:
     message(MSG_ERROR, "output method not available");
     exit(EXIT_FAILURE);
