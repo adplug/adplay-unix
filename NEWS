@@ -2,7 +2,7 @@ This is a brief overview of user-visible changes in adplay.
 
 Changes for version 1.10:
 -------------------------
-- None yet
+- Fixed handling of self-provided getopt for systems that don't provide it
 
 Changes for version 1.9:
 ------------------------
