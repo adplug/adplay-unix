@@ -31,6 +31,8 @@ extern "C" {
 #undef __argc
 #undef __argv
 
+#warning Your system does not appear to provide getopt.h. I am using my own version. Please note that this version is UNMAINTAINED and likely very old!
+
 /* For communication from `getopt' to the caller.
    When `getopt' finds an option that takes an argument,
    the argument value is returned here.

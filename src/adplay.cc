@@ -28,6 +28,8 @@
 #include <adplug/wemuopl.h>
 #include <adplug/diskopl.h>
 
+#include "defines.h"
+
 /*
  * Sun systems declare getopt in unistd.h,
  * other systems (Linux, Apple) use getopt.h.
@@ -38,13 +40,11 @@
 #	ifdef HAVE_GETOPT_H
 #		include <getopt.h>
 #	else
-#		include "getopt.h"
+#		include "getopt_compat.h"
 // ALSA now includes the system-wide getopt under Linux, so stop this
 #   define _GETOPT_POSIX_H 1
 #	endif
 #endif
-
-#include "defines.h"
 
 #ifdef HAVE_ADPLUG_NUKEDOPL
 #include <adplug/nemuopl.h>

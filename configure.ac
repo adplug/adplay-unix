@@ -25,8 +25,8 @@ versions. Please bear in mind that i am requiring at least version 1.4.])
 AC_CHECK_LIB(adplug,main,,AC_MSG_ERROR([*** AdPlug not installed ***]))])
 
 # Check if getopt header is installed on this system
-AC_CHECK_HEADERS([getopt.h], ,
-	AC_SUBST(GETOPT_SOURCES, [getopt.c getopt1.c getopt.h]))
+AC_CHECK_HEADERS([getopt.h])
+AM_CONDITIONAL([NEED_GETOPT], [test "x$ac_cv_header_getopt_h" = "xno"])
 
 # Save compiler flags and set up for compiling test programs
 oldlibs="$LIBS"
