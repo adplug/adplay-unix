@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=adplug
 Comment=adlib sound player
-Comment[fr}=lecteur de son adlib
+Comment[fr]=lecteur de son adlib
 Exec=adplug %f
 Icon=adplug
 Terminal=true
