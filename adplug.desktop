@@ -1,10 +1,12 @@
 [Desktop Entry]
 Name=adplug
 Comment=adlib sound player
+Comment[fr}=lecteur de son adlib
 Exec=adplug %f
 Icon=adplug
 Terminal=true
 Type=Application
 Categories=AudioVideo;AudioVideoEditing
 Keywords=music;playing;
+Keywords[fr]=musique;lecture;
 MimeTypes=audio/a2m;audio/adl;audio/amd;audio/cff;audio/cmf;audio/d00;audio/dtm;audio/hsc;audio/hsp;audio/laa;audio/lds;audio/rad;audio/raw;audio/sa2;audio/sng;audio/xad;audio/xms;audio/xsm;
